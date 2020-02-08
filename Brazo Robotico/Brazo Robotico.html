@@ -109,45 +109,44 @@
 			
 		    var onKeyDown = function ( event ) {
 				switch ( event.keyCode ) {
-					case 38: // ROTAR BASE 
+					case 38: // ROTAR BASE (FLECHA ARRIBA)
 						upArrow = true;
 						break;
-					case 40: // ROTAR BASE
+					case 40: // ROTAR BASE (FLECHA ABAJO)
 						downArrow = true;
 						break;
-					case 37: // ROTAR ESFERA1
+					case 37: // ROTAR ESFERA1 (FLECHA IZQUIERDA)
 						leftArrow = true;
 						break;
-					case 39: // ROTAR ESFERA1
+					case 39: // ROTAR ESFERA1 (FLECHA DERECHA)
 						rightArrow = true;
 						break;
-
-					case 100: // ROTAR ESFERA2
+					case 100: // ROTAR ESFERA2 (NUM 4)
 						rot1 = true;
 						break;
-					case 102: // ROTAR ESFERA2
+					case 102: // ROTAR ESFERA2 (NUM 6)
 						rot2 = true;
 						break;
 					}
 				};
 			var onKeyUp = function ( event ) {
 				switch ( event.keyCode ) {
-					case 38: // TRASLADAR
+					case 38: // ROTADOR BASE
 						upArrow = false;
 						break;
-					case 40: // TRASLADAR
+					case 40: // ROTADOR BASE
 						downArrow = false;
 						break;
-					case 37: // ROTAR CW
+					case 37: // ROTADOR ESFERA 1
 						leftArrow = false;
 						break;
-					case 39: // ROTAR CCW
+					case 39: // ROTADOR ESFERA 1
 						rightArrow = false;
 						break;
-					case 100: // ESCALA AGRANDAR
+					case 100: // ROTADOR ESFERA 2
 						rot1 = false;
 						break;
-					case 102: // ESCALA DISMINUIR
+					case 102: // ROTADOR ESFERA 2
 						rot2 = false;
 						break;
 				}
@@ -203,19 +202,22 @@
 			var cil1 = new THREE.Line( Cilindro(3,1,50), matPrueba);
 			var cil2 = new THREE.Line( Cilindro(3.5,1,50), matPrueba);
 			var con0 = new THREE.Line(Cono(2,2,50), matPrueba);
-			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,2.6,0) );
-			cil1.applyMatrix( new THREE.Matrix4().makeTranslation(0,2.9,0));
-			cil1.rotation.z = -0.2;
+			//UBICACIÓN EN EL ESPACIO DE LOS OBJETOS
+			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.2,0) );
+			cil1.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.2,0));
+			esf1.rotation.z = 0.6;
+			//cil1.rotation.z = -0.2;
 			con0.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.5,0));
-			esf2.applyMatrix( new THREE.Matrix4().makeTranslation(0.5,6,0));
-			cil2.applyMatrix( new THREE.Matrix4().makeTranslation(0.52,6.0,0));
-			cil2.rotation.z = 0.6; 
+			esf2.applyMatrix( new THREE.Matrix4().makeTranslation(0,3,0));
+			cil2.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.3,0.1));
+			esf2.rotation.z = 0.7;
+			//PADRE E HIJO
 			
 			base.add(espr);
-			base.add(con0);
-			base.add(esf1);
+			espr.add(con0);
+			con0.add(esf1);
 			esf1.add(cil1);
-			esf1.add(esf2);
+			cil1.add(esf2);
 			esf2.add(cil2);
 
 		  
@@ -226,16 +228,11 @@
 		  	scene.add( arrowY );	
 		  	scene.add( arrowZ );	
 			scene.add( base );
-			scene.add(esf1);
-			scene.add(espr); 	
-			scene.add(cil1);
-			scene.add(con0);
-			scene.add(esf2);
-			scene.add(cil2);
+
 			
-			camera.position.x = 5;
+			camera.position.x = 7;
 			camera.position.y = 20;	 
-		  	camera.position.z =  18;
+		  	camera.position.z = 20;
 			
 		  	camera.lookAt( origin );
 			}
@@ -247,13 +244,8 @@
     }
     
     function render(){
-	    if(leftArrow){
-		esf1.rotation += 0.1;
-		}
-        camera.lookAt( 0, 0, 0 );
         renderer.render( scene, camera );
     }
     </script>
   </body>
 </html>
-
