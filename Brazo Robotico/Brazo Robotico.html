@@ -121,11 +121,12 @@
 					case 39: // ROTAR ESFERA1
 						rightArrow = true;
 						break;
+
 					case 100: // ROTAR ESFERA2
-						leftArrow = true;
+						rot1 = true;
 						break;
 					case 102: // ROTAR ESFERA2
-						rightArrow = true;
+						rot2 = true;
 						break;
 					}
 				};
@@ -144,10 +145,10 @@
 						rightArrow = false;
 						break;
 					case 100: // ESCALA AGRANDAR
-						scaleUp = false;
+						rot1 = false;
 						break;
 					case 102: // ESCALA DISMINUIR
-						scaleDown = false;
+						rot2 = false;
 						break;
 				}
 			};	  	
@@ -194,14 +195,29 @@
 			//CREAR LOS OBJETOS
 			var matLinea = new THREE.LineBasicMaterial( { color: 0x3E3E3E } );
 			var matEs = new THREE.LineBasicMaterial( { color: 0x333366 } );
-			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xcb3234 });
-			var base = new THREE.Line( Cilindro(2, 2,25) , matLinea );
-			var espr = new THREE.Line( Espiral(2.01,2), matLinea );
-			var esf1 = new THREE.Line( Esfera(1), matEs );
-			var base1 = new THREE.Line( Cilindro(2,1,50), matPrueba);
+			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xFE801E });
+			var base = new THREE.Line( Cilindro(1.5, 2,25) , matLinea );
+			var espr = new THREE.Line( Espiral(2.01,1.5), matLinea );
+			var esf1 = new THREE.Line( Esfera(1), matLinea );
+			var esf2 = new THREE.Line( Esfera(1), matLinea );
+			var cil1 = new THREE.Line( Cilindro(3,1,50), matPrueba);
+			var cil2 = new THREE.Line( Cilindro(3.5,1,50), matPrueba);
 			var con0 = new THREE.Line(Cono(2,2,50), matPrueba);
-			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,1,0) );
-			base1.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.3,0));
+			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,2.6,0) );
+			cil1.applyMatrix( new THREE.Matrix4().makeTranslation(0,2.9,0));
+			cil1.rotation.z = -0.2;
+			con0.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.5,0));
+			esf2.applyMatrix( new THREE.Matrix4().makeTranslation(0.5,6,0));
+			cil2.applyMatrix( new THREE.Matrix4().makeTranslation(0.52,6.0,0));
+			cil2.rotation.z = 0.6; 
+			
+			base.add(espr);
+			base.add(con0);
+			base.add(esf1);
+			esf1.add(cil1);
+			esf1.add(esf2);
+			esf2.add(cil2);
+
 		  
 		  	//AGREGAR A LA ESCENA
 		  	//scene.add( gridHelperXY );
@@ -209,15 +225,17 @@
 		  	scene.add( arrowX );	
 		  	scene.add( arrowY );	
 		  	scene.add( arrowZ );	
-			//scene.add( base );
+			scene.add( base );
 			scene.add(esf1);
-			//scene.add(espr); 	
-			scene.add(base1);
+			scene.add(espr); 	
+			scene.add(cil1);
 			scene.add(con0);
+			scene.add(esf2);
+			scene.add(cil2);
 			
 			camera.position.x = 5;
-			camera.position.y = 10;	 
-		  	camera.position.z =  10;
+			camera.position.y = 20;	 
+		  	camera.position.z =  18;
 			
 		  	camera.lookAt( origin );
 			}
@@ -229,9 +247,13 @@
     }
     
     function render(){
+	    if(leftArrow){
+		esf1.rotation += 0.1;
+		}
         camera.lookAt( 0, 0, 0 );
         renderer.render( scene, camera );
     }
     </script>
   </body>
 </html>
+
