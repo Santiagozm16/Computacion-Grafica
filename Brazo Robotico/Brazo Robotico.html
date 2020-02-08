@@ -34,10 +34,10 @@
 		
 		init();
 		animate();
-		 //FUNCION PARA GENERAR CILINDROS
-		function Cilindro(altura, ancho){
+		//FUNCION PARA GENERAR CILINDROS
+		function Cilindro(altura, ancho,resolucion){
 		 var geoCilindro = new THREE.Geometry();
-	        var res = 25;
+	        var res = resolucion;
             for( var i = 0; i < res; i++){
                 for( var j = 0; j < res; j++){
                     var punto = new THREE.Vector3();
@@ -49,10 +49,27 @@
             }
 			return geoCilindro;
 	    }
+		//FUNCION PARA GENERAR CONOS
+		function Cono(altura,anchobase,resolucion){    
+		var geoCono = new THREE.Geometry();
+            var res = resolucion;
+            for( var i = 0; i < res; i++){
+                for( var j = 0; j < res; j++){
+                    var punto = new THREE.Vector3();
+                    punto.x = (anchobase * (res - i) / res ) * Math.cos( ( j * anchobase * Math.PI ) / res) ;
+                    punto.y = altura * i / res;
+                    punto.z = (anchobase * (res - i) / res ) * Math.sin( ( j * anchobase * Math.PI ) / res) ;
+					if(punto.y<anchobase/2){
+                    geoCono.vertices.push( punto );
+					}
+                }
+            }
+			return geoCono;
+		}
 		//FUNCION PARA GENERAR ESFERAS 
 	    function Esfera(radio){
 		    var geoEsfera = new THREE.Geometry();
-			var res = 45;
+			var res = 125;
 			for( var i = 0; i < res; i++){
                 for( var j = 0; j < res; j++){
 				var punto = new THREE.Vector3();
@@ -64,7 +81,23 @@
 		    }
 		 return geoEsfera;
 		}
-	
+		//FUNCION PARA GENERAR ESPIRAL(TAPA)
+		function Espiral(radio,altura){
+			var geoEspiral = new THREE.Geometry();
+			var Radianes;
+			for(var i = 0 ; i < 360 ; i++){
+				for(var r=0; r< radio; r=r+0.1 ){
+				Radianes = (i*Math.PI)/180;
+				var punto = new THREE.Vector3();
+				punto.x = r*Math.cos(Radianes); 
+				punto.y = altura;
+				punto.z = r*Math.sin(Radianes); 
+				geoEspiral.vertices.push(punto);
+				}
+			}
+		return geoEspiral;
+		}
+		
 		function init(){
 			scene = new THREE.Scene();
 			aspect = window.innerWidth / window.innerHeight;
@@ -161,10 +194,14 @@
 			//CREAR LOS OBJETOS
 			var matLinea = new THREE.LineBasicMaterial( { color: 0x3E3E3E } );
 			var matEs = new THREE.LineBasicMaterial( { color: 0x333366 } );
-			var base = new THREE.Line( Cilindro(2, 2) , matLinea );
+			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xcb3234 });
+			var base = new THREE.Line( Cilindro(2, 2,25) , matLinea );
+			var espr = new THREE.Line( Espiral(2.01,2), matLinea );
 			var esf1 = new THREE.Line( Esfera(1), matEs );
-			
-			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,2.5,0) );
+			var base1 = new THREE.Line( Cilindro(3,1,50), matPrueba);
+			var con0 = new THREE.Line(Cono(2,2,50), matPrueba);
+			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,1,0) );
+			base1.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.3,0));
 		  
 		  	//AGREGAR A LA ESCENA
 		  	//scene.add( gridHelperXY );
@@ -172,8 +209,11 @@
 		  	scene.add( arrowX );	
 		  	scene.add( arrowY );	
 		  	scene.add( arrowZ );	
-			scene.add( base );
+			//scene.add( base );
 			scene.add(esf1);
+			//scene.add(espr); 	
+			scene.add(base1);
+			scene.add(con0);
 			
 			camera.position.x = 5;
 			camera.position.y = 10;	 
