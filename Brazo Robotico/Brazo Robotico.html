@@ -59,12 +59,12 @@
 			return geoCilindro;
 	    }
 		//FUNCION PARA GENERAR CUBOS
-		function Cubo(dimensiones){
+		function Cubo(ancho,alto,profundo){
 			var geoCubo = new THREE.Geometry();
 			var i = 0, j=0,k=0;
-			for(i = 0; i<dimensiones;i=i+0.3 ){
-				for(j=0;j<dimensiones;j=j+0.3){
-					for(k=0;k<dimensiones;k=k+0.3){
+			for(i = 0; i<profundo;i=i+0.05 ){
+				for(j=0;j<alto;j=j+0.05){
+					for(k=0;k<ancho;k=k+0.05){
 						var punto = new THREE.Vector3();
 						punto.x = k;
 						punto.y = j;
@@ -254,7 +254,7 @@
 			var matLinea = new THREE.LineBasicMaterial( { color: 0x3E3E3E } );
 			var matEs = new THREE.LineBasicMaterial( { color: 0x333366 } );
 			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xFE801E });
-			cub = new THREE.Line(Cubo(3),matPrueba);
+			cub = new THREE.Line(Cubo(2,2,2),matEs);
 			base = new THREE.Line( Cilindro(1.5, 2,25) , matLinea );
 			espr = new THREE.Line( Espiral(2.01,1.5), matLinea );
 			esf1 = new THREE.Line( Esfera(1), matLinea );
@@ -271,6 +271,8 @@
 			esf2.applyMatrix( new THREE.Matrix4().makeTranslation(0,3,0));
 			cil2.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.3,0.1));
 			esf2.rotation.z = 0.7;
+			cub.position.z=3;
+			cub.position.x=-4.5;
 			//PADRE E HIJO
 			
 			base.add(espr);
@@ -288,6 +290,7 @@
 		  	scene.add( arrowY );	
 		  	scene.add( arrowZ );	
 			scene.add( base );
+			scene.add( cub );
 
 
 			
