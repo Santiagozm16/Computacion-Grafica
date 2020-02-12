@@ -26,6 +26,7 @@
 		var startTime = Date.now();
 		var base, esf1, esf2, base1;
 		var cil1, cil2;
+		var cub;
 		
 		var upArrow = false;
 		var downArrow = false;
@@ -57,6 +58,23 @@
             }
 			return geoCilindro;
 	    }
+		//FUNCION PARA GENERAR CUBOS
+		function Cubo(dimensiones){
+			var geoCubo = new THREE.Geometry();
+			var i = 0, j=0,k=0;
+			for(i = 0; i<dimensiones;i=i+0.3 ){
+				for(j=0;j<dimensiones;j=j+0.3){
+					for(k=0;k<dimensiones;k=k+0.3){
+						var punto = new THREE.Vector3();
+						punto.x = k;
+						punto.y = j;
+						punto.z = i;
+						geoCubo.vertices.push(punto);
+					}
+				}
+			}
+			return geoCubo;
+		}
 		//FUNCION PARA GENERAR CONOS
 		function Cono(altura,anchobase,resolucion){    
 		var geoCono = new THREE.Geometry();
@@ -236,6 +254,7 @@
 			var matLinea = new THREE.LineBasicMaterial( { color: 0x3E3E3E } );
 			var matEs = new THREE.LineBasicMaterial( { color: 0x333366 } );
 			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xFE801E });
+			cub = new THREE.Line(Cubo(3),matPrueba);
 			base = new THREE.Line( Cilindro(1.5, 2,25) , matLinea );
 			espr = new THREE.Line( Espiral(2.01,1.5), matLinea );
 			esf1 = new THREE.Line( Esfera(1), matLinea );
