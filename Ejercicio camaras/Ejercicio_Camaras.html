@@ -1,0 +1,243 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+    <title>Camara Perspectiva</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <script src="js/three.min.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src='js/libs/dat.gui.min.js'></script>
+    <script>
+		var scene, aspect, camera, camera2, camera3, camera4, renderer, controls;
+        var mapWidth =  window.innerWidth, mapHeight = window.innerHeight/2;
+        var w = window.innerWidth/3, h = window.innerHeight/2;
+		var startTime = Date.now();
+		var base, esf1, esf2, base1;
+		var cil1, cil2;
+		var cub;
+		
+		function Cilindro(altura, ancho,resolucion){
+		 var geoCilindro = new THREE.Geometry();
+	        var res = resolucion;
+            for( var i = 0; i < res; i++){
+                for( var j = 0; j < res; j++){
+                    var punto = new THREE.Vector3();
+                    punto.x = ancho * Math.cos( ( j * 2 * Math.PI )/res);
+                    punto.y = altura * i/res;
+                    punto.z = ancho * Math.sin( ( j * 2 * Math.PI )/res);
+                    geoCilindro.vertices.push( punto );
+                }
+            }
+			return geoCilindro;
+	    }
+		//FUNCION PARA GENERAR CUBOS
+		function Cubo(ancho,alto,profundo){
+			var geoCubo = new THREE.Geometry();
+			var i = 0, j=0,k=0;
+			for(i = 0; i<profundo;i=i+0.05 ){
+				for(j=0;j<alto;j=j+0.05){
+					for(k=0;k<ancho;k=k+0.05){
+						var punto = new THREE.Vector3();
+						punto.x = k;
+						punto.y = j;
+						punto.z = i;
+						geoCubo.vertices.push(punto);
+					}
+				}
+			}
+			return geoCubo;
+		}
+		//FUNCION PARA GENERAR CONOS
+		function Cono(altura,anchobase,resolucion){    
+		var geoCono = new THREE.Geometry();
+            var res = resolucion;
+            for( var i = 0; i < res; i++){
+                for( var j = 0; j < res; j++){
+                    var punto = new THREE.Vector3();
+                    punto.x = (anchobase * (res - i) / res ) * Math.cos( ( j * anchobase * Math.PI ) / res) ;
+                    punto.y = altura * i / res;
+                    punto.z = (anchobase * (res - i) / res ) * Math.sin( ( j * anchobase * Math.PI ) / res) ;
+					if(punto.y<anchobase/2){
+                    geoCono.vertices.push( punto );
+					}
+                }
+            }
+			return geoCono;
+		}
+		//FUNCION PARA GENERAR ESFERAS 
+	    function Esfera(radio){
+		    var geoEsfera = new THREE.Geometry();
+			var res = 125;
+			for( var i = 0; i < res; i++){
+                for( var j = 0; j < res; j++){
+				var punto = new THREE.Vector3();
+		        punto.x = radio * Math.cos( ( i * 2 * Math.PI )/res) * Math.sin( ( j * 2 * Math.PI )/res) ;
+                punto.y = radio * Math.cos( ( j * 2 * Math.PI )/res);
+                punto.z = radio * Math.sin( ( i * 2 * Math.PI )/res) * Math.sin( ( j * 2 * Math.PI )/res);
+				geoEsfera.vertices.push(punto);
+		        }
+		    }
+		 return geoEsfera;
+		}
+		//FUNCION PARA GENERAR ESPIRAL(TAPA)
+		function Espiral(radio,altura){
+			var geoEspiral = new THREE.Geometry();
+			var Radianes;
+			for(var i = 0 ; i < 360 ; i++){
+				for(var r=0; r< radio; r=r+0.1 ){
+				Radianes = (i*Math.PI)/180;
+				var punto = new THREE.Vector3();
+				punto.x = r*Math.cos(Radianes); 
+				punto.y = altura;
+				punto.z = r*Math.sin(Radianes); 
+				geoEspiral.vertices.push(punto);
+				}
+			}
+		return geoEspiral;
+		}
+		
+		init();
+		animate();
+	
+		function init(){
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x9c9c9c );
+			aspect = mapWidth / mapHeight;
+			camera = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			renderer = new THREE.WebGLRenderer({antialias: true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+            
+			var size = 10;
+			var arrowSize = 1;
+			var divisions = size;
+			var origin = new THREE.Vector3( 0, 0, 0 );
+			var x = new THREE.Vector3( 1, 0, 0 );
+			var y = new THREE.Vector3( 0, 1, 0 );
+		  	var z = new THREE.Vector3( 0, 0, 1 );
+			var color1 = new THREE.Color( 0xFFFFFF );
+		  	var color2 = new THREE.Color( 0x333333 );
+		  	var colorR = new THREE.Color( 0xAA3333 );
+		  	var colorG = new THREE.Color( 0x33AA33 );
+		  	var colorB = new THREE.Color( 0x333366 );
+		  
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+		  	var gridHelperXY = new THREE.GridHelper( size, divisions, color1, color1);
+		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color2, color2 );
+		  	var gridHelperYZ = new THREE.GridHelper( size, divisions, color2, color2 );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXY.rotateOnWorldAxis ( x, THREE.Math.degToRad(90) );
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+            gridHelperYZ.rotateOnWorldAxis ( z, THREE.Math.degToRad(90) );
+            
+            //CREAR LAS FLECHAS QUE INDICAN LOS EJES DE COORDENADAS 3D
+            var arrowX = new THREE.ArrowHelper( x, origin, arrowSize, colorR );
+            var arrowY = new THREE.ArrowHelper( y, origin, arrowSize, colorG );
+            var arrowZ = new THREE.ArrowHelper( z, origin, arrowSize, colorB );
+            
+			
+			//CREAR LAS GEOMETRÍAS
+			//Far plane
+			var width = 16.0;
+			var height = 9.0;
+			var FOV = 45.0;			//Ángulo de apertura
+			var sinFOV = Math.sin((FOV/2.0)*Math.PI/180.0);
+			var aR = width/height;	//AspectRatio
+			var nearZ = 1;
+			var farZ = 100;
+			var COA = new THREE.Vector3(-5,2,0);
+			var planeGeometry = new THREE.PlaneGeometry(width, height);
+            
+            camera2 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
+            var helper = new THREE.CameraHelper( camera2 );
+            //scene.add( helper );
+			
+			camera3 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
+			var helper2 = new THREE.CameraHelper( camera3 );
+			//scene.add( helper2 );
+			
+			camera4 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
+			var helper3 = new THREE.CameraHelper( camera4 );
+            //scene.add( helper3 );
+			
+			//CUBO EN EL ESPACIO
+			var boxGeometry = new THREE.BoxGeometry(1,2,1);
+				
+			//CREAR LOS MATERIALES
+            var matLinea = new THREE.LineBasicMaterial( { color: 0x3E3E3E } );
+			var matEs = new THREE.LineBasicMaterial( { color: 0x333366 } );
+			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xFE801E });
+			cub = new THREE.Line(Cubo(2,2,2),matEs);
+			base = new THREE.Line( Cilindro(1.5, 2,25) , matLinea );
+			espr = new THREE.Line( Espiral(2.01,1.5), matLinea );
+			esf1 = new THREE.Line( Esfera(1), matLinea );
+			esf2 = new THREE.Line( Esfera(1), matLinea );
+			cil1 = new THREE.Line( Cilindro(3,1,50), matPrueba);
+			cil2 = new THREE.Line( Cilindro(3.5,1,50), matPrueba);
+			con0 = new THREE.Line(Cono(2,2,50), matPrueba);
+			//UBICACIÓN EN EL ESPACIO DE LOS OBJETOS
+			base.position.z = -20;
+			base.position.y= -2;
+			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.2,0) );
+			cil1.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.2,0));
+			esf1.rotation.z = 0.8;
+			//cil1.rotation.z = -0.2;
+			con0.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.5,0));
+			esf2.applyMatrix( new THREE.Matrix4().makeTranslation(0,3,0));
+			cil2.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.3,0.1));
+			esf2.rotation.z = 0.7;
+			cub.position.z=3;
+			cub.position.x=-4.5;
+			//PADRE E HIJO
+			
+			base.add(espr);
+			espr.add(con0);
+			con0.add(esf1);
+			esf1.add(cil1);
+			cil1.add(esf2);
+			esf2.add(cil2);
+			
+			//CREAR LOS OBJETOS
+            scene.add( arrowX );
+            scene.add( arrowY );
+            scene.add( arrowZ );
+            scene.add( base );
+			scene.add(camera3);
+           
+			camera.position.x = 0;
+			camera.position.y = 5;
+		  	camera.position.z = 10;
+			
+		  	camera.lookAt( origin );
+            
+           
+		}
+		function animate() {
+			requestAnimationFrame( animate );
+			controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
+			render();
+		}
+        function render() {
+            renderer.setViewport( 0, 0, w, h );
+            renderer.setScissor( 0, 0, w, h );
+            renderer.render( scene, camera2 );
+			renderer.setViewport( w, 0, w, h );
+            renderer.setScissor( w, 0, w, h );
+            renderer.render( scene, camera3 );
+			renderer.setViewport( 2*w, 0, w, h );
+            renderer.setScissor( 2*w, 0, w, h );
+            renderer.render( scene, camera4 );
+            renderer.setViewport( 10, mapHeight - 10, mapWidth, mapHeight );
+            renderer.setScissor( 0,   mapHeight ,  mapWidth, mapHeight );
+            renderer.setScissorTest( true );
+            renderer.render( scene, camera );
+		}
+    </script>
+  </body>
+</html>
