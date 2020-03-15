@@ -18,7 +18,6 @@
 		var startTime = Date.now();
 		var base, esf1, esf2, base1;
 		var cil1, cil2;
-		var cub;
 		
 		var upArrow = false;
 		var downArrow = false;
@@ -279,7 +278,16 @@
             var matLinea = new THREE.LineBasicMaterial( { color: 0xFFE4C4 } );
 			var matEs = new THREE.LineBasicMaterial( { color: 0x333366 } );
 			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xcb3234 });
-			cub = new THREE.Line(Cubo(1,1,1),matEs);
+			
+			//objetos para la escena.
+			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+			var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+			var cub = new THREE.Mesh( geometry, material );
+			var geometry = new THREE.ConeBufferGeometry( 1, 1, 32 );
+			var cone = new THREE.Mesh( geometry, matLinea );
+			var geometry = new THREE.CylinderBufferGeometry( 1, 1, 1, 32 );
+			var cylinder = new THREE.Mesh( geometry, matPrueba );
+			//objetos brazo
 			base = new THREE.Line( Cilindro(1.5, 2,25) , matLinea );
 			espr = new THREE.Line( Espiral(2.01,1.5), matLinea );
 			esf1 = new THREE.Line( Esfera(1), matLinea );
@@ -298,8 +306,16 @@
 			esf2.applyMatrix( new THREE.Matrix4().makeTranslation(0,3,0));
 			cil2.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.3,0.1));
 			esf2.rotation.z = 0.7;
-			cub.position.z=3;
+			//Ubicar objetos
+			cub.position.z=4.5;
 			cub.position.x=-4.5;
+			cub.position.y=0.5;
+			cone.position.z=1;
+			cone.position.x=-4.5;
+			cone.position.y=0.5;
+			cylinder.position.z=-3;
+			cylinder.position.x=-4.5;
+			cylinder.position.y=0.5;
 			//PADRE E HIJO
 			
 			base.add(espr);
@@ -320,6 +336,8 @@
             //scene.add( arrowZ );
             scene.add(base);
 			scene.add(cub);
+			scene.add( cone );
+			scene.add( cylinder );
 			scene.add( gridHelperXZ );
 		  	//camera.lookAt( origin );
             
