@@ -121,6 +121,7 @@
 			scene.background = new THREE.Color( 0x000000 );
 			aspect = mapWidth / mapHeight;
 			camera = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			var helper4 = new THREE.CameraHelper( camera );
 			renderer = new THREE.WebGLRenderer({antialias: true});
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
@@ -256,7 +257,7 @@
             var helper = new THREE.CameraHelper( camera2 );
 			camera2.position.z=20;
 			camera2.position.y=3;
-            //scene.add( helper );
+            scene.add( helper4 );
 			
 			camera3 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
 			camera3.rotation.x=Math.PI/2;
@@ -307,19 +308,21 @@
 			esf1.add(cil1);
 			cil1.add(esf2);
 			esf2.add(cil2);
+			cil2.add(camera);
 			
+			camera.position.x = 0;
+			camera.position.y = 3.5;
+			camera.position.z = 0;
+			camera.rotation.y=Math.PI/2;
+			camera.rotation.y=Math.PI/2;
 			//CREAR LOS OBJETOS
             //scene.add( arrowX );
             //scene.add( arrowY );
             //scene.add( arrowZ );
-            scene.add( base );
-			
-           
-			camera.position.x = 0;
-			camera.position.y = 5;
-		  	camera.position.z = 20;
-			
-		  	camera.lookAt( origin );
+            scene.add(base);
+			scene.add(cub);
+			scene.add( gridHelperXZ );
+		  	//camera.lookAt( origin );
             
            
 		}
@@ -369,12 +372,10 @@
 		if(trans3){
 		if(base.position.z>-4)
 		base.position.z -=0.1;
-		console.log(base.position.z);
 		}
 		if(trans4){
 		if(base.position.z<3.05)
 		base.position.z +=0.1;
-		console.log(base.position.z);
 		}
             renderer.setViewport( 0, 0, w, h );
             renderer.setScissor( 0, 0, w, h );
