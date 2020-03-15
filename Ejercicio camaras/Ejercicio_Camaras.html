@@ -144,8 +144,8 @@
 			
 			//CREAR LAS GEOMETRÍAS
 			//Far plane
-			var width = 16.0;
-			var height = 9.0;
+			var width = 30;
+			var height = 15;
 			var FOV = 45.0;			//Ángulo de apertura
 			var sinFOV = Math.sin((FOV/2.0)*Math.PI/180.0);
 			var aR = width/height;	//AspectRatio
@@ -156,14 +156,21 @@
             
             camera2 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
             var helper = new THREE.CameraHelper( camera2 );
+			camera2.position.z=20;
+			camera2.position.y=3;
             //scene.add( helper );
 			
 			camera3 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
+			camera3.rotation.x=Math.PI/2;
+			camera3.position.y=-15;
 			var helper2 = new THREE.CameraHelper( camera3 );
 			//scene.add( helper2 );
 			
 			camera4 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
 			var helper3 = new THREE.CameraHelper( camera4 );
+			camera4.rotation.y=Math.PI/2;
+			camera4.position.y =3;
+			camera4.position.x=15;
             //scene.add( helper3 );
 			
 			//CUBO EN EL ESPACIO
@@ -182,8 +189,8 @@
 			cil2 = new THREE.Line( Cilindro(3.5,1,50), matPrueba);
 			con0 = new THREE.Line(Cono(2,2,50), matPrueba);
 			//UBICACIÓN EN EL ESPACIO DE LOS OBJETOS
-			base.position.z = -20;
-			base.position.y= -2;
+			//base.position.z = -20;
+			//base.position.y= -2;
 			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.2,0) );
 			cil1.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.2,0));
 			esf1.rotation.z = 0.8;
@@ -212,7 +219,7 @@
            
 			camera.position.x = 0;
 			camera.position.y = 5;
-		  	camera.position.z = 10;
+		  	camera.position.z = 20;
 			
 		  	camera.lookAt( origin );
             
@@ -236,6 +243,7 @@
             renderer.setViewport( 10, mapHeight - 10, mapWidth, mapHeight );
             renderer.setScissor( 0,   mapHeight ,  mapWidth, mapHeight );
             renderer.setScissorTest( true );
+			
             renderer.render( scene, camera );
 		}
     </script>
