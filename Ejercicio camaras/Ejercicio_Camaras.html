@@ -279,7 +279,7 @@
             var matLinea = new THREE.LineBasicMaterial( { color: 0xFFE4C4 } );
 			var matEs = new THREE.LineBasicMaterial( { color: 0x333366 } );
 			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xcb3234 });
-			cub = new THREE.Line(Cubo(2,2,2),matEs);
+			cub = new THREE.Line(Cubo(1,1,1),matEs);
 			base = new THREE.Line( Cilindro(1.5, 2,25) , matLinea );
 			espr = new THREE.Line( Espiral(2.01,1.5), matLinea );
 			esf1 = new THREE.Line( Esfera(1), matLinea );
@@ -313,8 +313,7 @@
 			camera.position.x = 0;
 			camera.position.y = 3.5;
 			camera.position.z = 0;
-			camera.rotation.y=Math.PI/2;
-			camera.rotation.y=Math.PI/2;
+			console.log(camera.matrix);
 			//CREAR LOS OBJETOS
             //scene.add( arrowX );
             //scene.add( arrowY );
@@ -332,7 +331,8 @@
 			render();
 		}
         function render() {
-			if(upArrow){
+	    camera.rotation.y=Math.PI;
+		if(upArrow){
 		if(esf1.rotation.z<1)
 		esf1.rotation.z += 0.1;
 		}
