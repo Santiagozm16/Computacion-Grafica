@@ -124,7 +124,7 @@
 			renderer = new THREE.WebGLRenderer({antialias: true});
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			//controls = new THREE.OrbitControls( camera, renderer.domElement );
             //EVENTO DE TECLADO
 			
 		    var onKeyDown = function ( event ) {
@@ -256,7 +256,7 @@
             var helper = new THREE.CameraHelper( camera2 );
 			camera2.position.z=20;
 			camera2.position.y=3;
-            scene.add( helper4 );
+            //scene.add( helper );
 			
 			camera3 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
 			camera3.rotation.x=Math.PI/2;
@@ -339,17 +339,18 @@
 			scene.add( cone );
 			scene.add( cylinder );
 			scene.add( gridHelperXZ );
+			//scene.add( helper4 );
 		  	//camera.lookAt( origin );
             
            
 		}
 		function animate() {
 			requestAnimationFrame( animate );
-			controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
+			//controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 			render();
 		}
         function render() {
-	    camera.rotation.y=Math.PI;
+	    camera.rotation.x=Math.PI/2;
 		if(upArrow){
 		if(esf1.rotation.z<1)
 		esf1.rotation.z += 0.1;
