@@ -1,13 +1,18 @@
  <!DOCTYPE html>
 <html>
   <head>
-    <title>Camara Perspectiva</title>
-	  
+    <title>Camaras brazo</title> 
     <style>
       html, body { margin: 0; padding: 0; overflow: hidden; }
     </style>
   </head>
   <body>
+        <div id="info">Camaras brazo<br/>
+            Usar teclas 'W','A','S','D' para transladar la base<br/>
+			Usar flechas para rotar la primera esfera</br>
+			Usar teclas 8 y 2 para subir o bajar la garra.<br/>
+			Usar teclas 4 y 6 para girar la garra.<br/>
+        </div>
     <script src="js/three.min.js"></script>
     <script src="js/controls/OrbitControls.js"></script>
     <script src='js/libs/dat.gui.min.js'></script>
@@ -259,8 +264,8 @@
             //scene.add( helper );
 			
 			camera3 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
-			camera3.rotation.x=Math.PI/2;
-			camera3.position.y=-15;
+			camera3.rotation.x= -Math.PI/2;
+			camera3.position.y=15;
 			var helper2 = new THREE.CameraHelper( camera3 );
 			//scene.add( helper2 );
 			
@@ -316,6 +321,10 @@
 			cylinder.position.z=-3;
 			cylinder.position.x=-4.5;
 			cylinder.position.y=0.5;
+			esf1.rotation.z = 1;
+			base.position.x = 2.90;
+			base.position.z = 0.9;
+			esf2.rotation.z = 1.2;
 			//PADRE E HIJO
 			
 			base.add(espr);
