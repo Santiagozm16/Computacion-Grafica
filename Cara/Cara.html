@@ -14,7 +14,7 @@
         </style>
   </head>
   <body>
-  <div id="info">Brazo Robotico<br/>
+  <div id="info">Ejercicio Cara<br/>
 		Presentado por: Alejandra Pedraza y Andrés Santiago Rodríguez<br/>
         </div>
     <script src="js/three.js"></script>
@@ -242,8 +242,9 @@
         var lineaOjoI =  new THREE.Line( geoOjos, matOjos );
         var lineaOjoD =  new THREE.Line( geoOjos, matOjos );
         lineaOjoD.position.x=1;
-        lineaOjoD.position.z=0.02;
-        lineaOjoI.position.z=0.02;
+        lineaOjoD.position.z=0.01;
+        lineaOjoI.position.z=0.01;
+		
 
         lips = new TRIANGLE_STRIP(geoBoca,matLabios);
 			  var labios = lips.draw();
@@ -292,6 +293,8 @@
         earD = fan.draw();
         earD.rotation.y = Math.PI;
         earD.position.x = 2;
+		earD.position.y= -0.25;
+		earI.position.y= -0.25;
         var lineEari = new THREE.Line( geoOrejas, matCara );
         var lineEard = new THREE.Line( geoOrejas, matCara );
         lineEard.rotation.y = Math.PI;
