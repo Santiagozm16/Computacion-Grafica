@@ -1,53 +1,62 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Ej: Cara</title>
     <style>
-      html, body { margin: 0; padding: 0; overflow: hidden; }
-    </style>
+            html, body { margin: 0; padding: 0; overflow: hidden; }
+            #info {
+                position: absolute;
+                padding: 10px;
+                width: 100%;
+                text-align: center;
+                color: #FFFFFF;
+            }
+        </style>
   </head>
   <body>
+  <div id="info">Brazo Robotico<br/>
+		Presentado por: Alejandra Pedraza y Andrés Santiago Rodríguez<br/>
+        </div>
     <script src="js/three.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
     <script>
-		var scene, aspect, camera, renderer, controls;
-		var startTime = Date.now();
-		var Chin;
-		var face;
-		var eye;
-		var lips;
-		var eyebrows;
-		
-		class TRIANGLE_FAN{
-		  constructor( Geometria,Material ){
+       var scene, aspect, camera, renderer, controls;
+		   var startTime = Date.now();
+       var face, hair, earI, earD, chin, eye, lips, eyebrows, nose;
+       var strip;
+       var strip2;
+       var fan;
+
+       class TRIANGLE_FAN{	
+		  constructor( Geometria, Material ){
 		    this.geometria = Geometria;
-			console.log(this.geometria);
-			this.Material = Material; 
+        this.material = Material;
 		  }  
 		  draw(){			
 			for( var i=2; i<this.geometria.vertices.length; i++ ){
+			  console.log(this.geometria.vertices.length)
 			  this.geometria.faces.push( new THREE.Face3(0,i-1,i) );
 			}
 			this.geometria.computeFaceNormals();
-			var fan1 = new THREE.Mesh( this.geometria, this.Material );
-			//scene.add( fan );
-			return fan1;
+			var materialFan = new THREE.MeshBasicMaterial( { color: 0x3333DD, side:THREE.DoubleSide } );
+			var fan1 = new THREE.Mesh( this.geometria, this.material );
+      return fan1;
 		  }
 		}
-		
-		class TRIANGLE_STRIP{	
-		  constructor( Geometria,Material ){
+
+       class TRIANGLE_STRIP{	
+		  constructor( Geometria, Material ){
 		    this.geometria = Geometria;
+        this.material = Material;
 			console.log(this.geometria);
-			this.Material = Material;
 		  }  
 		  draw(){			
 			for( var i=2; i<this.geometria.vertices.length; i++ ){
-			  this.geometria.faces.push( new THREE.Face3(i,i-1,i-2) );
+			  this.geometria.faces.push( new THREE.Face3(i-2,i-1,i) );
 			}
 			this.geometria.computeFaceNormals();
-			var strip1 = new THREE.Mesh( this.geometria, this.Material );
-			return strip1;
+			var strip = new THREE.Mesh( this.geometria, this.material );;
+      return strip;
 		  }
 		}
 		
@@ -58,172 +67,274 @@
 			scene = new THREE.Scene();
 			aspect = window.innerWidth / window.innerHeight;
 			camera = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
-			renderer = new THREE.WebGLRenderer({antialias: true});
+			renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
             				  
 			var size = 10;
 			var arrowSize = 1;
+			var divisions = size;
 			var origin = new THREE.Vector3( 0, 0, 0 );
 			var x = new THREE.Vector3( 1, 0, 0 );
 			var y = new THREE.Vector3( 0, 1, 0 );
-		  	var z = new THREE.Vector3( 0, 0, 1 );
+		  var z = new THREE.Vector3( 0, 0, 1 );
 			var color1 = new THREE.Color( 0xFFFFFF );
-		  	var color2 = new THREE.Color( 0x333333 );
-		  	var colorR = new THREE.Color( 0xAA3333 );
-		  	var colorG = new THREE.Color( 0x33AA33 );
-		  	var colorB = new THREE.Color( 0x333366 );
+		  var color2 = new THREE.Color( 0x333333 );
+		  var colorR = new THREE.Color( 0xAA3333 );
+		  var colorG = new THREE.Color( 0x33AA33 );
+		  var colorB = new THREE.Color( 0x333366 );
+		  
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+		  	var gridHelperXY = new THREE.GridHelper( size, divisions, color1, color1);
+		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color2, color2 );
+		  	var gridHelperYZ = new THREE.GridHelper( size, divisions, color2, color2 );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXY.rotateOnWorldAxis ( x, THREE.Math.degToRad(90) );
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+            gridHelperYZ.rotateOnWorldAxis ( z, THREE.Math.degToRad(90) );
             
             //CREAR LAS FLECHAS QUE INDICAN LOS EJES DE COORDENADAS 3D
             var arrowX = new THREE.ArrowHelper( x, origin, arrowSize, colorR );
             var arrowY = new THREE.ArrowHelper( y, origin, arrowSize, colorG );
             var arrowZ = new THREE.ArrowHelper( z, origin, arrowSize, colorB );
-			
-			//CREAR ILUMINACIÓN
-            var ambient = new THREE.AmbientLight( 0xffffff, 2 );
-            scene.add( ambient );
             
-            var pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
-            pointLight.position.set( 5, 5, -5 );
-            scene.add( pointLight );
-			
-			//CREAR LOS MATERIALES
-			
+            //MATERIALES
             var matCara = new THREE.LineBasicMaterial( { color: 0xcba894, side:THREE.DoubleSide } ); 
 			var matLinea = new THREE.LineBasicMaterial( { color: colorG, side:THREE.DoubleSide } );
 			var matBarbilla = new THREE.LineBasicMaterial ({color : 0xb9876e , side:THREE.DoubleSide});
 			var matOjos = new THREE.LineBasicMaterial ({color: 0x000031, side:THREE.DoubleSide });
 			var matLabios = new THREE.LineBasicMaterial ({color: 0x9f6969, side:THREE.DoubleSide }); 
 			var matCejas = new THREE.LineBasicMaterial ({color: 0x884920, side:THREE.DoubleSide });
-			
-			//CREAR LAS GEOMETRÍAS
-			
-            var GeoCara = new THREE.Geometry();//GEOMETRIA CARA
-			for(var i =0;i <=2; i=i+2){
-				for(var j = 0; j<=2; j=j+2){
-				var puntoCara = new THREE.Vector3(i,j);
-				GeoCara.vertices.push( puntoCara );
-				}
+            var matPelo = new THREE.LineBasicMaterial( { color: 0x794400, side:THREE.DoubleSide } ); 
+            var matLinea = new THREE.LineBasicMaterial( { color: 0xFFFFFF } ); 
+
+        //CREAR LAS GEOMTRIAS
+		
+        var geoCara = new THREE.Geometry(); //GEOMETRIA CARA
+        var res = 2;
+        for(var i = 0; i <= res; i++ ){
+            var punto = new THREE.Vector3();
+            var punto2 = new THREE.Vector3();
+            punto.x = i;
+            punto2.x = i;
+            punto2.y = 2;
+            geoCara.vertices.push(punto);
+            geoCara.vertices.push(punto2);
+          }
+
+        var geoBarbilla = new THREE.Geometry(); //GEOMETRIA BARBILLA
+			  var pInicial = new THREE.Vector3(1,-0.2,0);
+			  geoBarbilla.vertices.push(pInicial);
+			  for(var i = 0; i<=2;i++){
+				 var puntoB = new THREE.Vector3(i,0,0);
+				 geoBarbilla.vertices.push(puntoB);
 			}
-			
-			var GeoBarbilla = new THREE.Geometry(); //GEOMETRIA BARBILLA
-			var pInicial = new THREE.Vector3(1,-0.2,0);
-			GeoBarbilla.vertices.push(pInicial);
-			for(var i = 0; i<=2;i++){
-				var puntoB = new THREE.Vector3(i,0,0);
-				GeoBarbilla.vertices.push(puntoB);
+        var geoOjos = new THREE.Geometry(); //GEOMETRIA OJOS
+			  var poInicial = new THREE.Vector3(0.5,1.2,0);
+			  geoOjos.vertices.push(poInicial);
+			  for(var i = 0; i<=360; i=i+30){
+				 var ojito = new THREE.Vector3();
+				 ojito.x = 0.15*Math.cos(i*Math.PI/180)+0.5;
+				 ojito.y = 0.15*Math.sin(i*Math.PI/180)+1.2;
+				 geoOjos.vertices.push(ojito);
 			}
-			
-			var GeoOjos = new THREE.Geometry(); //GEOMETRIA OJOS
-			var poInicial = new THREE.Vector3(0.5,1.2,0);
-			GeoOjos.vertices.push(poInicial);
-			for(var i = 0; i<=360; i=i+30){
-				var ojito = new THREE.Vector3();
-				ojito.x = 0.15*Math.cos(i*Math.PI/180)+0.5;
-				ojito.y = 0.15*Math.sin(i*Math.PI/180)+1.2;
-				GeoOjos.vertices.push(ojito);
-			}
-			
-			var GeoBoca = new THREE.Geometry(); //GEOMETRIA BOCA
-			var pInicialB1 = new THREE.Vector3(0.25,0.25,0);
-			var pInicialB2= new THREE.Vector3(0.28,0.20,0);
-			GeoBoca.vertices.push(pInicialB1);
-			GeoBoca.vertices.push(pInicialB2);
+      var geoBoca = new THREE.Geometry(); //GEOMETRIA BOCA
+			var pInicialB1 = new THREE.Vector3(0.55,0.35,0);
+			var pInicialB2= new THREE.Vector3(0.58,0.30,0);
+			geoBoca.vertices.push(pInicialB1);
+			geoBoca.vertices.push(pInicialB2);
 			for (var i = 0.5;i<=1.5;i=i+0.25){
 				if(i<=1.25){
-				var punto1 = new THREE.Vector3(i,0.25,0);
-				var punto2 = new THREE.Vector3(i+0.03,0.20,0);
-				GeoBoca.vertices.push(punto1);
-				GeoBoca.vertices.push(punto2);
+				var punto1 = new THREE.Vector3(i,0.35,0);
+				var punto2 = new THREE.Vector3(i+0.03,0.30,0);
+				geoBoca.vertices.push(punto1);
+				geoBoca.vertices.push(punto2);
 				}else{
-				var punto1 = new THREE.Vector3(i,0.25,0);
-				var punto2 = new THREE.Vector3(i-0.03,0.20,0);
-				GeoBoca.vertices.push(punto1);
-				GeoBoca.vertices.push(punto2);
+				var punto1 = new THREE.Vector3(i,0.35,0);
+				var punto2 = new THREE.Vector3(i-0.03,0.30,0);
+				geoBoca.vertices.push(punto1);
+				geoBoca.vertices.push(punto2);
 				}
 			}
-			
-			var GeoCejas = new THREE.Geometry(); //GEOMETRIA CEJAS
+
+      var geoCejas = new THREE.Geometry(); //GEOMETRIA CEJAS
 			var pInicialC1 = new THREE.Vector3(0.2,0.20,0);
 			var pInicialC2= new THREE.Vector3(0.23,0.25,0);
-			GeoCejas.vertices.push(pInicialC2);
-			GeoCejas.vertices.push(pInicialC1);
+			geoCejas.vertices.push(pInicialC2);
+			geoCejas.vertices.push(pInicialC1);
 			for (var i = 0.5;i<=0.8;i=i+0.2){
 				if(i<=0.6){
 				var punto3 = new THREE.Vector3(i,0.20,0);
 				var punto4 = new THREE.Vector3(i+0.03,0.25,0);
-				GeoCejas.vertices.push(punto4);
-				GeoCejas.vertices.push(punto3);
+				geoCejas.vertices.push(punto4);
+				geoCejas.vertices.push(punto3);
 				}else{
 				var punto3 = new THREE.Vector3(i,0.20,0);
 				var punto4 = new THREE.Vector3(i-0.03,0.25,0);
-				GeoCejas.vertices.push(punto4);
-				GeoCejas.vertices.push(punto3);
+				geoCejas.vertices.push(punto4);
+				geoCejas.vertices.push(punto3);
 				}
 			}
-			
-			//CARGAR GEOMETRIAS AL FAN O STRIP
-			Chin = new TRIANGLE_FAN(GeoBarbilla,matBarbilla);	
-			var menton = Chin.draw();
-			var lineas = new THREE.Line( GeoCara, matBarbilla );
-			face = new TRIANGLE_STRIP(GeoCara,matCara);
-			var cara = face.draw();
-			var lineas2 = new THREE.Line( GeoBarbilla, matCara );
-			eye = new TRIANGLE_FAN(GeoOjos,matOjos);
-			var ojoi = eye.draw();
-			var ojod = eye.draw();
-			ojod.position.x=1;
-			var lineas3 = new THREE.Line (GeoOjos, matOjos);
-			var lineas4 = new THREE.Line (GeoOjos, matOjos);
-			lips = new TRIANGLE_STRIP(GeoBoca,matLabios);
-			var labios = lips.draw();
-			var lineas5 = new THREE.Line (GeoBoca, matLabios);
-			eyebrows = new TRIANGLE_STRIP(GeoCejas,matCejas);
+        
+        var geoPelo = new THREE.Geometry();
+        var pInicialP1 = new THREE.Vector3(-0.1,2,0);
+			var pInicialP2= new THREE.Vector3(0,2.5,0);
+			geoPelo.vertices.push(pInicialP2);
+			geoPelo.vertices.push(pInicialP1);
+			for (var i = 0;i<=2;i= i+0.5){
+				if(i<=0.5){
+				var punto9 = new THREE.Vector3(2.05,2,0);
+				var punto10 = new THREE.Vector3(i+0.05,2.5,0);
+				geoPelo.vertices.push(punto9);
+				geoPelo.vertices.push(punto10);
+				}else{
+				var punto9 = new THREE.Vector3(2.05,2,0);
+				var punto10 = new THREE.Vector3(i-0.05,2.5,0);
+				geoPelo.vertices.push(punto9);
+				geoPelo.vertices.push(punto10);
+        }
+      }
+        var geoOrejas = new THREE.Geometry();
+        var punto0 = new THREE.Vector3(0,1.7,0);
+        geoOrejas.vertices.push( punto0 );
+        for(var i = 0; i <= 1; i++ ){
+          var punto5 = new THREE.Vector3();
+          var punto6 =  new THREE.Vector3();
+          punto5.x = -0.3;
+          punto5.y = 1.5;
+          punto6.y = 0.8;
+          geoOrejas.vertices.push(punto5);
+          geoOrejas.vertices.push(punto6);
+           } 
+        var geoNariz = new THREE.Geometry();
+        var punto00 = new THREE.Vector3(1,1.3,0); 
+        geoNariz.vertices.push( punto00 );//CR
+        for(var i = 0; i <= 1; i++ ){
+          var punto7 = new THREE.Vector3();
+          var punto8 =  new THREE.Vector3();
+          punto7.x = 1.2;
+          punto7.y = 0.7
+          punto8.x = 0.8;
+          punto8.y = 0.7;
+          geoNariz.vertices.push(punto7);
+          geoNariz.vertices.push(punto8);
+           } 
+        //STRIP Y FAN
+        strip = new TRIANGLE_STRIP(geoCara, matCara);
+			  face = strip.draw();
+	    face.position.x = -0.8;
+		face.position.y = -0.5;
+        var lineaFace = new THREE.Line( geoCara, matCara );
+
+        chin = new TRIANGLE_FAN(geoBarbilla,matBarbilla);	
+			  var menton = chin.draw();
+        var lineaMenton = new THREE.Line( geoBarbilla, matBarbilla );
+
+        eye = new TRIANGLE_FAN(geoOjos,matOjos);
+			  var ojoi = eye.draw();
+			  var ojod = eye.draw();
+        ojod.position.x=1;
+		ojod.position.z=0.01;
+	    ojoi.position.z=0.01;
+        var lineaOjoI =  new THREE.Line( geoOjos, matOjos );
+        var lineaOjoD =  new THREE.Line( geoOjos, matOjos );
+        lineaOjoD.position.x=1;
+        lineaOjoD.position.z=0.02;
+        lineaOjoI.position.z=0.02;
+
+        lips = new TRIANGLE_STRIP(geoBoca,matLabios);
+			  var labios = lips.draw();
+        labios.position.z = 0.01;
+			  var lineaLabios = new THREE.Line (geoBoca,matLabios);
+        lineaLabios.position.z = 0.01;
+
+        eyebrows = new TRIANGLE_STRIP(geoCejas,matCejas);
 			var cejaizq = eyebrows.draw();
 			var cejader = eyebrows.draw();
-			var lineas6 = new THREE.Line (GeoCejas, matCejas);
-			var lineas7= new THREE.Line (GeoCejas, matCejas);
-			
-			//ASIGNAR POSICIONES
-			labios.position.x=0.1;
-			labios.position.y=0.1;
 			cejaizq.position.x=0.04;
 			cejaizq.position.y=1.2;
 			cejader.position.x=1.04;
 			cejader.position.y=1.2;
-			ojod.position.x=1;
-			ojod.position.z=0.01;
-			ojoi.position.z=0.01;
-			labios.position.z=0.01;
 			cejaizq.position.z=0.01;
 			cejader.position.z=0.01;
+			var lineaCejaI = new THREE.Line (geoCejas, matCejas);
+			var lineaCejaD= new THREE.Line (geoCejas,matCejas);
+			lineaCejaI.position.x=0.04;
+			lineaCejaI.position.y=1.2;
+			lineaCejaD.position.x=1.04;
+			lineaCejaD.position.y=1.2;
+			lineaCejaI.position.z=0.01;
+			lineaCejaD.position.z=0.01;
+
+        nose = new TRIANGLE_FAN(geoNariz,matBarbilla);
+        var nariz = nose.draw();
+        nariz.position.z = 0.01;
+        var lineaNariz = new THREE.Line (geoNariz, matBarbilla);
+        lineaNariz.position.z = 0.01;
+
+
+        strip2 = new TRIANGLE_STRIP(geoPelo, matPelo);
+        hair = strip2.draw();
+        hair.position.z = 0.01;
+        hair.position.x = 0.02;
+        hair.position.y = -0.3;
+        var lineaHair = new THREE.Line( geoPelo, matPelo );
+        lineaHair.position.z = 0.01;
+		lineaHair.position.x = 0.02;
+		lineaHair.position.y = -0.3;
+
+        
+        fan = new TRIANGLE_FAN(geoOrejas,matBarbilla);	
+	    earI = fan.draw();
+        earD = fan.draw();
+        earD.rotation.y = Math.PI;
+        earD.position.x = 2;
+        var lineEari = new THREE.Line( geoOrejas, matCara );
+        var lineEard = new THREE.Line( geoOrejas, matCara );
+        lineEard.rotation.y = Math.PI;
+        lineEard.position.x = 2;
+		
+		//PADRE E HIJO
+		
+		face.add(menton);
+		face.add(hair);
+		face.add(earD);
+		face.add(earI);
+		face.add(ojoi);
+		face.add(ojod);
+		face.add(labios);
+		face.add(cejader);
+		face.add(cejaizq);
+		face.add(nariz);
+		
+		//PADRE E HIJO LINEAS
+		//face.add(lineaFace);
+        //menton.add(lineaMenton);
+        //hair.add(lineaHair);
+        //earD.add(lineEard);
+        //earI.add(lineEari);
+        //ojoi.add(lineaOjoI);
+        //ojod.add(lineaOjoD);
+        //labios.add(lineaLabios);
+        //cejader.add(lineaCejaD);
+        //cejaizq.add(lineaCejaI);
+        //nariz.add(lineaNariz);
+		
+        //AÑADIR A LA ESCENA
+		
+        //scene.add( gridHelperXZ );
+		//scene.add( arrowX );	
+		//scene.add( arrowY );	
+		//scene.add( arrowZ );
+        scene.add (face);
+	    camera.position.x = 0;
+	    camera.position.y = 0;	 
+		camera.position.z = 8;
 			
-			//PADRE E HIJO.
-			
-			/*cara.add(lineas2);
-			menton.add(lineas);
-			ojoi.add(lineas3);
-			ojod.add(lineas4);
-			labios.add(lineas5);
-			cejaizq.add(lineas6);
-			cejader.add(lineas7);*/
-			
-			cara.add(menton);
-			cara.add(ojod);
-			cara.add(ojoi);
-			cara.add(labios);
-			cara.add(cejader);
-			cara.add(cejaizq);
-		  	//AGREGAR A LA ESCENA
-			
-		  	scene.add( arrowZ );
-			scene.add(cara);
-			
-			camera.position.x = 0;
-			camera.position.y = 0;	 
-		  	camera.position.z = 8;
-		  	camera.lookAt( origin );
+		  camera.lookAt( origin );
 			}
     
     function animate() {
@@ -238,3 +349,4 @@
     </script>
   </body>
 </html>
+
