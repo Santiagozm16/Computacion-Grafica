@@ -21,7 +21,7 @@
 	<script src="js/controls/OrbitControls.js"></script>
     <script>
        var scene, aspect, camera, renderer, controls;
-		   var startTime = Date.now();
+	   var startTime = Date.now();
        var face, hair, earI, earD, chin, eye, lips, eyebrows, nose;
        var strip;
        var strip2;
@@ -52,7 +52,7 @@
 		  }  
 		  draw(){			
 			for( var i=2; i<this.geometria.vertices.length; i++ ){
-			  this.geometria.faces.push( new THREE.Face3(i-2,i-1,i) );
+			this.geometria.faces.push( new THREE.Face3(i-2,i-1,i) );
 			}
 			this.geometria.computeFaceNormals();
 			var strip = new THREE.Mesh( this.geometria, this.material );;
@@ -105,11 +105,11 @@
             var matCara = new THREE.LineBasicMaterial( { color: 0xcba894, side:THREE.DoubleSide } ); 
 			var matLinea = new THREE.LineBasicMaterial( { color: colorG, side:THREE.DoubleSide } );
 			var matBarbilla = new THREE.LineBasicMaterial ({color : 0xb9876e , side:THREE.DoubleSide});
-			var matOjos = new THREE.LineBasicMaterial ({color: 0x000031, side:THREE.DoubleSide });
-			var matLabios = new THREE.LineBasicMaterial ({color: 0x9f6969, side:THREE.DoubleSide }); 
-			var matCejas = new THREE.LineBasicMaterial ({color: 0x884920, side:THREE.DoubleSide });
+			var matOjos = new THREE.LineBasicMaterial ({color: 0x000031});
+			var matLabios = new THREE.LineBasicMaterial ({color: 0x9f6969 , side:THREE.DoubleSide }); 
+			var matCejas = new THREE.LineBasicMaterial ({color: 0x884920, side:THREE.DoubleSide});
             var matPelo = new THREE.LineBasicMaterial( { color: 0x794400, side:THREE.DoubleSide } ); 
-            var matLinea = new THREE.LineBasicMaterial( { color: 0xFFFFFF } ); 
+            var matLinea = new THREE.LineBasicMaterial( { color: colorR, side:THREE.DoubleSid } ); 
 
         //CREAR LAS GEOMTRIAS
 		
@@ -142,10 +142,6 @@
 				 geoOjos.vertices.push(ojito);
 			}
       var geoBoca = new THREE.Geometry(); //GEOMETRIA BOCA
-			var pInicialB1 = new THREE.Vector3(0.55,0.35,0);
-			var pInicialB2= new THREE.Vector3(0.58,0.30,0);
-			geoBoca.vertices.push(pInicialB1);
-			geoBoca.vertices.push(pInicialB2);
 			for (var i = 0.5;i<=1.5;i=i+0.25){
 				if(i<=1.25){
 				var punto1 = new THREE.Vector3(i,0.35,0);
@@ -161,11 +157,7 @@
 			}
 
       var geoCejas = new THREE.Geometry(); //GEOMETRIA CEJAS
-			var pInicialC1 = new THREE.Vector3(0.2,0.20,0);
-			var pInicialC2= new THREE.Vector3(0.23,0.25,0);
-			geoCejas.vertices.push(pInicialC2);
-			geoCejas.vertices.push(pInicialC1);
-			for (var i = 0.5;i<=0.8;i=i+0.2){
+			for (var i = 0.3;i<=0.8;i=i+0.2){
 				if(i<=0.6){
 				var punto3 = new THREE.Vector3(i,0.20,0);
 				var punto4 = new THREE.Vector3(i+0.03,0.25,0);
@@ -230,12 +222,12 @@
         var lineaFace = new THREE.Line( geoCara, matCara );
 
         chin = new TRIANGLE_FAN(geoBarbilla,matBarbilla);	
-			  var menton = chin.draw();
+		var menton = chin.draw();
         var lineaMenton = new THREE.Line( geoBarbilla, matBarbilla );
 
         eye = new TRIANGLE_FAN(geoOjos,matOjos);
-			  var ojoi = eye.draw();
-			  var ojod = eye.draw();
+	    var ojoi = eye.draw();
+		var ojod = eye.draw();
         ojod.position.x=1;
 		ojod.position.z=0.01;
 	    ojoi.position.z=0.01;
@@ -247,28 +239,23 @@
 		
 
         lips = new TRIANGLE_STRIP(geoBoca,matLabios);
-			  var labios = lips.draw();
+		var labios = lips.draw();
         labios.position.z = 0.01;
-			  var lineaLabios = new THREE.Line (geoBoca,matLabios);
+		var lineaLabios = new THREE.Line (geoBoca,matLabios);
         lineaLabios.position.z = 0.01;
 
         eyebrows = new TRIANGLE_STRIP(geoCejas,matCejas);
 			var cejaizq = eyebrows.draw();
 			var cejader = eyebrows.draw();
-			cejaizq.position.x=0.04;
+			cejaizq.position.x=0.0;
 			cejaizq.position.y=1.2;
-			cejader.position.x=1.04;
+			cejader.position.x=1.0;
 			cejader.position.y=1.2;
 			cejaizq.position.z=0.01;
 			cejader.position.z=0.01;
-			var lineaCejaI = new THREE.Line (geoCejas, matCejas);
+			var lineaCejaI = new THREE.Line (geoCejas, matOjos);
 			var lineaCejaD= new THREE.Line (geoCejas,matCejas);
-			lineaCejaI.position.x=0.04;
-			lineaCejaI.position.y=1.2;
-			lineaCejaD.position.x=1.04;
-			lineaCejaD.position.y=1.2;
-			lineaCejaI.position.z=0.01;
-			lineaCejaD.position.z=0.01;
+			
 
         nose = new TRIANGLE_FAN(geoNariz,matBarbilla);
         var nariz = nose.draw();
@@ -312,7 +299,6 @@
 		face.add(cejader);
 		face.add(cejaizq);
 		face.add(nariz);
-		
 		//PADRE E HIJO LINEAS
 		//face.add(lineaFace);
         //menton.add(lineaMenton);
