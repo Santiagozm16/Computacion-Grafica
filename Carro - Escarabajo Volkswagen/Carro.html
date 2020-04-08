@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Escarabajo</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <script src="js/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/csg.js"></script>
+	<script src="js/THREE.CSG.js"></script>
+    <script>
+		var scene, aspect, camera, renderer, controls;
+		init();
+		animate();
+		function init(){
+			//INICIALIZACIÓN
+	        scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xAAAAAA );
+	        aspect = window.innerWidth / window.innerHeight;
+	        camera = new THREE.PerspectiveCamera( 75, aspect, 0.1, 1000);
+	        renderer = new THREE.WebGLRenderer();
+	        renderer.setSize( window.innerWidth, window.innerHeight );
+	        document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			
+			//ELEMENTOS COMUNES
+			var size = 10;
+			var arrowSize = 1;
+			var divisions = size;
+			var origin = new THREE.Vector3( 0, 0, 0 );
+			var x = new THREE.Vector3( 1, 0, 0 );
+			var y = new THREE.Vector3( 0, 1, 0 );
+		  	var z = new THREE.Vector3( 0, 0, 1 );
+		  	var color = new THREE.Color( 0x333333 );
+		  	var colorR = new THREE.Color( 0xAA3333 );
+		  	var colorG = new THREE.Color( 0x33AA33 );
+		  	var colorB = new THREE.Color( 0x333366 );
+			
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+			//scene.add( axesHelper );
+			
+		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color, color );
+			scene.add( gridHelperXZ );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+
+            //CREAR ILUMINACIÓN
+            var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+            scene.add( ambient );
+			
+            var pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
+            pointLight.position.set( -5, 1, 5 );
+            scene.add( pointLight );
+			
+            var pointLight = new THREE.PointLight( 0xffffff, .5, 100 );
+            pointLight.position.set( 5, 1, -5 );
+            scene.add( pointLight );
+			
+			var curvaChasis = []; //CURVA DEL CHASIS
+                curvaChasis[0] = new THREE.Vector2( 0, 0 );
+                curvaChasis[1] = new THREE.Vector2( -1.98, 0 );
+                curvaChasis[2] = new THREE.Vector2( -2.14, 0.44 );
+                curvaChasis[3] = new THREE.Vector2( -2.68, 0.58 );
+                curvaChasis[4] = new THREE.Vector2( -3.24, 0.44 );
+                curvaChasis[5] = new THREE.Vector2( -3.5, 0 );
+                curvaChasis[6] = new THREE.Vector2( -4.18, 0 );
+                curvaChasis[7] = new THREE.Vector2( -4.86, 0 );		
+                curvaChasis[8] = new THREE.Vector2( -4.72, 0.46 );
+                curvaChasis[9] = new THREE.Vector2( -4.36, 0.94 );
+                curvaChasis[10] = new THREE.Vector2( -4, 1.36 );
+                curvaChasis[11] = new THREE.Vector2( -3.62, 1.72 );
+				curvaChasis[12] = new THREE.Vector2( -3.1, 2.12 );
+				curvaChasis[13] = new THREE.Vector2( -2.56, 2.42 );
+				curvaChasis[14] = new THREE.Vector2( -2.08, 2.64 );
+				curvaChasis[15] = new THREE.Vector2( 0.86, 3.04 );
+				curvaChasis[16] = new THREE.Vector2( 1.86, 2.78 );
+				curvaChasis[17] = new THREE.Vector2( 2.4, 1.72 );
+				curvaChasis[18] = new THREE.Vector2( 3.18, 1.62 );
+				curvaChasis[19] = new THREE.Vector2( 4.08, 1.38 );
+				curvaChasis[20] = new THREE.Vector2( 4.54, 0.84 );
+				curvaChasis[21] = new THREE.Vector2( 4.86, 0 );
+				curvaChasis[22] = new THREE.Vector2( 4.18, 0 );
+				curvaChasis[23] = new THREE.Vector2( 3.5, 0 );
+				curvaChasis[24] = new THREE.Vector2( 3.24, 0.44 );
+				curvaChasis[25] = new THREE.Vector2( 2.68, 0.58 );
+				curvaChasis[26] = new THREE.Vector2( 2.14, 0.44 );
+				curvaChasis[27] = new THREE.Vector2( 1.98, 0 );
+			
+			//SHAPE
+			var shapeChasis = new THREE.Shape(); 
+			shapeChasis.moveTo(0,0);
+			shapeChasis.splineThru(curvaChasis);
+			
+			//EXTRUDE
+			var extrudeSettings = {
+				steps: 2,
+				amount: -2.5,
+				bevelEnabled: false,
+			};
+
+			var geoChasis = new THREE.ExtrudeGeometry( shapeChasis, extrudeSettings ); //GEOMETRIA DEL CHASIS
+			geoChasis.computeFaceNormals();
+			var materialChasis= new THREE.MeshStandardMaterial( { //MATERIAL DEL CHASIS
+			color: 0x053c75, 
+			side:THREE.DoubleSide,
+			metalness: 0.5} );
+			var chasis = new THREE.Mesh( geoChasis, materialChasis ) ;
+			chasis.position.y=0.75;
+			
+			//CREAR LAS GEOMETRÍAS
+			var boxGeometry = new THREE.BoxGeometry( 0.9, 0.9, 0.11 );
+			var sphereGeometry = new THREE.SphereGeometry( .5, 32, 32 );
+			var torusGeometry = new THREE.TorusBufferGeometry( 0.55, 0.15, 20, 54 );
+						
+			//CREAR LOS MATERIALES
+            var material1 = new THREE.MeshStandardMaterial( { color: colorR, metalness: 0.5, roughness: 0.1 } );
+			var material2 = new THREE.MeshStandardMaterial( { color: colorG, metalness: 0.5, roughness: 0.1 } );
+			var material3 = new THREE.MeshStandardMaterial( { color: 0x141518, metalness: 0.5, roughness: 0.1 } );
+			
+			//CREAR LAS MALLAS
+			var cube = new THREE.Mesh( boxGeometry, material1 );
+			var sphere = new THREE.Mesh( sphereGeometry, material2 );
+			var torus = new THREE.Mesh(torusGeometry,material1);
+			sphere.translateZ(-0.32);
+			cube.translateZ(-0.04);
+			
+			//CONVERTIR A CSG
+			var boxCSG = THREE.CSG.fromMesh( cube );
+			var sphereCSG = THREE.CSG.fromMesh( sphere );
+			var torusCSG = THREE.CSG.fromMesh(torus);
+			
+			//APLICAR LAS OPERACIONES
+			
+			var result = sphereCSG.intersect( boxCSG );
+			
+			//CONVERTIR A THREE
+			var cube1 = THREE.CSG.toMesh( result );
+			cube1.material = material2;
+			cube1.translateZ(0.125);
+			//APLICAR OPERACIONES Y VOLVER A THREE
+			var rin = THREE.CSG.fromMesh(cube1);
+			var ruedaCSG = torusCSG.union( rin );
+			var rueda = THREE.CSG.toMesh( ruedaCSG );
+
+			rueda.material = material3;
+			rueda.position.x=2.68;
+			rueda.position.z=-0.1;
+			rueda.position.y=-0.1;
+			
+			//Padre e Hijo
+			chasis.add(rueda);
+			
+			//AGREGAR A LA ESCENA LOS DIFERENTES ELEMENTOS
+			
+			scene.add( chasis );
+			
+
+			camera.position.x = 10;
+			camera.position.y = 10;
+		  	camera.position.z = 10;
+			camera.lookAt( origin );
+		}
+		function animate(){
+			requestAnimationFrame( animate );
+			controls.update();
+			render();
+		}
+		function render(){
+			renderer.render( scene, camera );
+		}
+    </script>
+  </body>
+</html>
