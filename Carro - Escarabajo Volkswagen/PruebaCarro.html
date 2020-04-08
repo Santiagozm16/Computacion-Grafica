@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Escarabajo</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <script src="js/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/csg.js"></script>
+	<script src="js/THREE.CSG.js"></script>
+    <script>
+		var scene, aspect, camera, renderer, controls;
+		init();
+		animate();
+		function init(){
+			//INICIALIZACIÓN
+	        scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xAAAAAA );
+	        aspect = window.innerWidth / window.innerHeight;
+	        camera = new THREE.PerspectiveCamera( 75, aspect, 0.1, 1000);
+	        renderer = new THREE.WebGLRenderer({antialias: true});
+	        renderer.setSize( window.innerWidth, window.innerHeight );
+	        document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			
+			//ELEMENTOS COMUNES
+			var size = 10;
+			var arrowSize = 1;
+			var divisions = size;
+			var origin = new THREE.Vector3( 0, 0, 0 );
+			var x = new THREE.Vector3( 1, 0, 0 );
+			var y = new THREE.Vector3( 0, 1, 0 );
+		  	var z = new THREE.Vector3( 0, 0, 1 );
+		  	var color = new THREE.Color( 0x333333 );
+		  	var colorR = new THREE.Color( 0xAA3333 );
+		  	var colorG = new THREE.Color( 0x33AA33 );
+		  	var colorB = new THREE.Color( 0x333366 );
+			
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+			//scene.add( axesHelper );
+			
+		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color, color );
+			scene.add( gridHelperXZ );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+
+            //CREAR ILUMINACIÓN
+            var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+            scene.add( ambient );
+			
+            var pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
+            pointLight.position.set( -5, 1, 5 );
+            scene.add( pointLight );
+			
+            var pointLight = new THREE.PointLight( 0xffffff, .5, 100 );
+            pointLight.position.set( 5, 1, -5 );
+            scene.add( pointLight );
+			
+			var curvaChasis = []; //CURVA DEL CHASIS
+                curvaChasis[0] = new THREE.Vector2( 0, 0 );
+                curvaChasis[1] = new THREE.Vector2( -2.5 , 0 );
+                curvaChasis[2] = new THREE.Vector2( -3.2, 0.8);
+                curvaChasis[3] = new THREE.Vector2( -3.9, 1);
+				curvaChasis[4] = new THREE.Vector2( -4.5, 0.7);
+                curvaChasis[5] = new THREE.Vector2( -4.9, 0 );
+				curvaChasis[6] = new THREE.Vector2( -5.8, 0);
+                curvaChasis[7] = new THREE.Vector2( -5.5, 0.73 );
+                curvaChasis[8] = new THREE.Vector2( -5.05, 1.46 );
+                curvaChasis[9] = new THREE.Vector2( -4.7, 1.90 );
+                curvaChasis[10] = new THREE.Vector2( -4.2, 2.40 );
+                curvaChasis[11] = new THREE.Vector2( -3.9, 2.66 );
+                curvaChasis[12] = new THREE.Vector2( -2.80, 3.40 );
+				curvaChasis[13] = new THREE.Vector2( -0.9, 3.7 );
+                curvaChasis[14] = new THREE.Vector2( 0.8, 3.4 );
+                curvaChasis[15] = new THREE.Vector2( 1.50, 2.40 );
+                curvaChasis[16] = new THREE.Vector2( 2, 2.25 );
+                curvaChasis[17] = new THREE.Vector2( 2.5, 2.20 );
+                curvaChasis[18] = new THREE.Vector2( 3.2, 2.10 );
+                curvaChasis[19] = new THREE.Vector2( 4.5, 1.5  );
+				curvaChasis[20] = new THREE.Vector2( 5.2, 0 );
+				curvaChasis[21] = new THREE.Vector2( 4.5, 0 );
+                curvaChasis[22] = new THREE.Vector2( 4.1, 0.7);
+                curvaChasis[23] = new THREE.Vector2( 3.5, 1);
+				curvaChasis[24] = new THREE.Vector2( 2.9, 0.7);
+                curvaChasis[25] = new THREE.Vector2( 2.6, 0 );
+				
+			var curvaVentana = []; //CURVA VENTANA
+                curvaVentana[0] = new THREE.Vector2( 0, 0 );
+                curvaVentana[1] = new THREE.Vector2( 1.78, 0 );
+                curvaVentana[2] = new THREE.Vector2( 2, 0.300 );
+                curvaVentana[3] = new THREE.Vector2( 1.403, 0.880 );
+                curvaVentana[4] = new THREE.Vector2( 0.263, 0.880 );
+                curvaVentana[5] = new THREE.Vector2( 0, 0.640 );
+			
+			var curvaVentana2 = [];
+                curvaVentana2[0] = new THREE.Vector2( 0, 0 );
+                curvaVentana2[1] = new THREE.Vector2( -1.78, 0 );
+                curvaVentana2[2] = new THREE.Vector2( -2, 0.340 );
+                curvaVentana2[3] = new THREE.Vector2( -1.403, 0.80 );
+                curvaVentana2[4] = new THREE.Vector2( -0.323, 0.880 );
+                curvaVentana2[5] = new THREE.Vector2( 0, 0.640 );
+			
+			 var curvaPanoramico = [];
+                curvaPanoramico[0] = new THREE.Vector2( 0, 0 );
+                curvaPanoramico[1] = new THREE.Vector2( 1.5, 0 );
+                curvaPanoramico[2] = new THREE.Vector2( 1.7, 0.5 );
+                curvaPanoramico[3] = new THREE.Vector2( 1.5, 1.020 );
+                curvaPanoramico[4] = new THREE.Vector2( 0, 1.120 );
+                curvaPanoramico[5] = new THREE.Vector2( -1.5, 1.020 );
+                curvaPanoramico[6] = new THREE.Vector2( -1.6, 0.5 );
+                curvaPanoramico[7] = new THREE.Vector2( -1.5, 0 );
+				
+			var curvaVentanasTraseras = [];
+                curvaVentanasTraseras[0] = new THREE.Vector2( 0, 0.5 );
+                curvaVentanasTraseras[1] = new THREE.Vector2( 0.2, 0 );
+                curvaVentanasTraseras[2] = new THREE.Vector2( 1.2, 0.1 );
+                curvaVentanasTraseras[3] = new THREE.Vector2( 1.4, 0.4 );
+				curvaVentanasTraseras[4] = new THREE.Vector2( 1.05, 0.7 )
+                curvaVentanasTraseras[5] = new THREE.Vector2( 0.2, 1 );
+				curvaVentanasTraseras[6] = new THREE.Vector2( 0, 0.5 );
+			
+			var curvaVentanasTraseras2 = [];
+                curvaVentanasTraseras2[0] = new THREE.Vector2( 0, 0.5 );
+                curvaVentanasTraseras2[1] = new THREE.Vector2( -0.2, 0 );
+                curvaVentanasTraseras2[2] = new THREE.Vector2( -1.2, 0.1 );
+                curvaVentanasTraseras2[3] = new THREE.Vector2( -1.4, 0.4 );
+				curvaVentanasTraseras2[4] = new THREE.Vector2( -1.05, 0.7 )
+                curvaVentanasTraseras2[5] = new THREE.Vector2( -0.2, 1 );
+				curvaVentanasTraseras2[6] = new THREE.Vector2( 0, 0.5 );
+				
+			//SHAPE
+			var shapeChasis = new THREE.Shape(); 
+			shapeChasis.moveTo(0,0);
+			shapeChasis.splineThru(curvaChasis);
+			
+			var shapeVentana = new THREE.Shape();
+			shapeVentana.moveTo(0,0);
+			shapeVentana.splineThru(curvaVentana);
+			
+			var shapeVentana2 = new THREE.Shape();
+			shapeVentana2.moveTo(0,0);
+			shapeVentana2.splineThru(curvaVentana2);
+			
+			var shapePanoramico = new THREE.Shape();
+			shapePanoramico.moveTo(0,0);
+			shapePanoramico.splineThru(curvaPanoramico);
+			
+			var shapeVentanasTraseras = new THREE.Shape();
+			shapeVentanasTraseras.moveTo(0,0);
+			shapeVentanasTraseras.splineThru(curvaVentanasTraseras);
+			
+			var shapeVentanasTraseras2 = new THREE.Shape();
+			shapeVentanasTraseras2.moveTo(0,0);
+			shapeVentanasTraseras2.splineThru(curvaVentanasTraseras2);
+			
+			//EXTRUDE CHASIS
+			var extrudeSettings = {
+				steps: 2,
+				amount: -3.5,
+				bevelEnabled: false,
+			};
+			var geoChasis = new THREE.ExtrudeGeometry( shapeChasis, extrudeSettings ); //GEOMETRIA DEL CHASIS
+			geoChasis.computeFaceNormals();
+			var materialChasis= new THREE.MeshStandardMaterial( { //MATERIAL DEL CHASIS
+			color: 0x053c75, 
+			side:THREE.DoubleSide,
+			metalness: 0.5} );
+			var chasis = new THREE.Mesh( geoChasis, materialChasis ) ;
+			chasis.position.y=0.75;
+			
+			var extrudeSettingsVentana = { //EXTRUDE VENTANAS
+				steps: 5,
+				amount: 0.2,
+				bevelEnabled: false,
+			};
+			var geoVentana = new THREE.ExtrudeGeometry( shapeVentana, extrudeSettingsVentana ); //GEOMETRIA VENTANA
+			var materialVentana= new THREE.MeshStandardMaterial( {
+			color: 0x6CADD1, 
+			side:THREE.DoubleSide} );
+			geoVentana.computeFaceNormals();
+			var ventana = new THREE.Mesh( geoVentana, materialVentana ) ;
+			ventana.position.y =2.25;
+			ventana.position.x=-0.9;
+			ventana.position.z=-0.15;
+			var ventana2 = ventana.clone();
+			ventana2.position.z=-3.55
+			//ventanas de los puestos traseros
+			var geoVentana2 = new THREE.ExtrudeGeometry( shapeVentana2, extrudeSettingsVentana );
+			geoVentana2.computeFaceNormals();
+			var ventana3 = new THREE.Mesh( geoVentana2, materialVentana ) ;
+			ventana3.position.x=-1.2;
+			ventana3.position.y=2.25;
+			ventana3.position.z=-0.15;
+			var ventana4 = ventana3.clone();
+			ventana4.position.z=-3.55
+			//panoramico
+			var geoPanoramico = new THREE.ExtrudeGeometry( shapePanoramico, extrudeSettingsVentana );
+			geoPanoramico.computeFaceNormals();
+			var panoramico = new THREE.Mesh( geoPanoramico, materialVentana ) ;
+			//ROTACIÓN DEL PANORAMICO
+			var angulorad = (-30*Math.PI)/180; //PASAR ANGULO A RADIANES
+			var cos = Math.cos(angulorad); 
+			var sen = Math.sin(angulorad);
+			var r = new THREE.Matrix4();
+			r.set(	1,0,0,0,
+					0,cos,-sen,0,
+					0,sen,cos,0,
+					0,0,0,1		);
+			panoramico.applyMatrix(r);
+			panoramico.elementsNeedUpdate = true;
+			var angulorad1 = (90*Math.PI)/180; //PASAR ANGULO A RADIANES
+			var cos1 = Math.cos(angulorad1); 
+			var sen1 = Math.sin(angulorad1);
+			var t = new THREE.Matrix4();
+			t.set(	cos1,0,sen1,0,
+					0,1,0,0,
+					-sen1,0,cos1,0,
+					0,0,0,1		);
+			panoramico.applyMatrix(t);
+			panoramico.position.y=2.28;
+			panoramico.position.x=1.4;
+			panoramico.position.z=-1.7;
+			panoramico.elementsNeedUpdate = true;
+			var geoVentanasTraseras = new THREE.ExtrudeGeometry( shapeVentanasTraseras, extrudeSettingsVentana ); //Geometria ventanas traseras
+			geoVentanasTraseras.computeFaceNormals();
+			var ventanaTrasera = new THREE.Mesh( geoVentanasTraseras, materialVentana ) ;
+			//ROTACIÓN DE LA VENTANA TRASERA
+			var angulorad2 = (-50*Math.PI)/180; //PASAR ANGULO A RADIANES
+			var cos2 = Math.cos(angulorad2); 
+			var sen2 = Math.sin(angulorad2);
+			var r2 = new THREE.Matrix4();
+			r2.set(	1,0,0,0,
+					0,cos2,-sen2,0,
+					0,sen2,cos2,0,
+					0,0,0,1		);
+			ventanaTrasera.applyMatrix(r2);
+			ventanaTrasera.elementsNeedUpdate = true;
+			var angulorad3 = (270*Math.PI)/180; //PASAR ANGULO A RADIANES
+			var cos3 = Math.cos(angulorad3); 
+			var sen3 = Math.sin(angulorad3);
+			var t2 = new THREE.Matrix4();
+			t2.set(	cos3,0,sen3,0,
+					0,1,0,0,
+					-sen3,0,cos3,0,
+					0,0,0,1		);
+			ventanaTrasera.applyMatrix(t2);
+			ventanaTrasera.elementsNeedUpdate = true;
+			ventanaTrasera.position.y=2.28;
+			ventanaTrasera.position.x=-4.2;
+			ventanaTrasera.position.z=-1.75;
+			//VENTANA TRASERA 2
+			var geoVentanasTraseras2 = new THREE.ExtrudeGeometry( shapeVentanasTraseras2, extrudeSettingsVentana ); //Geometria ventanas traseras
+			geoVentanasTraseras2.computeFaceNormals();
+			var ventanaTrasera2 = new THREE.Mesh( geoVentanasTraseras2, materialVentana ) ;
+			//ROTACIÓN DE LA VENTANA TRASERA
+			var angulorad4 = (-50*Math.PI)/180; //PASAR ANGULO A RADIANES
+			var cos4 = Math.cos(angulorad4); 
+			var sen4 = Math.sin(angulorad4);
+			var r3 = new THREE.Matrix4();
+			r3.set(	1,0,0,0,
+					0,cos4,-sen4,0,
+					0,sen4,cos4,0,
+					0,0,0,1		);
+			ventanaTrasera2.applyMatrix(r3);
+			ventanaTrasera2.elementsNeedUpdate = true;
+			var angulorad5 = (270*Math.PI)/180; //PASAR ANGULO A RADIANES
+			var cos5 = Math.cos(angulorad5); 
+			var sen5 = Math.sin(angulorad5);
+			var t3 = new THREE.Matrix4();
+			t3.set(	cos5,0,sen5,0,
+					0,1,0,0,
+					-sen5,0,cos5,0,
+					0,0,0,1		);
+			ventanaTrasera2.applyMatrix(t3);
+			ventanaTrasera2.elementsNeedUpdate = true;
+			ventanaTrasera2.position.y=2.28;
+			ventanaTrasera2.position.x=-4.2;
+			ventanaTrasera2.position.z=-1.81;
+			
+			//CREAR LAS GEOMETRÍAS
+			var boxGeometry = new THREE.BoxGeometry( 0.9, 0.9, 0.11 );
+			var boxGeometry = new THREE.BoxGeometry( 0.9, 0.9, 0.11 );
+			var sphereGeometry = new THREE.SphereGeometry( .5, 32, 32 );
+			var torusGeometry = new THREE.TorusBufferGeometry( 0.55, 0.15, 20, 54 );
+			var boxGeometryPeldaño = new THREE.BoxGeometry( 5.6, 0.05, 4 );
+			var boxGeometryEspejo = new THREE.BoxGeometry( 0.8, 0.5, 0.2 );
+			var cylindergeometryEspejo = new THREE.CylinderBufferGeometry( 0.1, 0.1, 0.7 ,60 );
+			var planeGeometry = new THREE.PlaneGeometry( 0.6, 0.3, 32 );
+			//CREAR LOS MATERIALES
+            var material1 = new THREE.MeshStandardMaterial( { color: colorR, metalness: 0.5, roughness: 0.1 } );
+			var material2 = new THREE.MeshStandardMaterial( { color: colorG, metalness: 0.5, roughness: 0.1 } );
+			var material3 = new THREE.MeshStandardMaterial( { color: 0x141518, metalness: 0.5, roughness: 0.1 } );
+			var materialReflejo = new THREE.MeshStandardMaterial({ color: 0x8a9597, side:THREE.DoubleSide } );
+			//CREAR LAS MALLAS
+			var cube = new THREE.Mesh( boxGeometry, material1 );
+			var sphere = new THREE.Mesh( sphereGeometry, material2 );
+			var torus = new THREE.Mesh(torusGeometry,material1);
+			var peldaño = new THREE.Mesh(boxGeometryPeldaño,materialChasis);
+			var cubeEspejo = new THREE.Mesh( boxGeometryEspejo, material1 );
+			var cylinderEspejo = new THREE.Mesh( cylindergeometryEspejo, material2 );
+			var plane = new THREE.Mesh(planeGeometry, materialReflejo);
+			sphere.translateZ(-0.32);
+			cube.translateZ(-0.04);
+			peldaño.translateZ(-1.75);
+			cubeEspejo.translateX( 1.5 );
+			cubeEspejo.translateY( .5 );
+			cylinderEspejo.rotation.z=(-30*Math.PI)/180;
+			cylinderEspejo.position.x=1;
+			plane.position.z=0.11;
+			plane.position.y=0.5;
+			plane.position.x=1.5;
+			var plane2 = plane.clone();
+			plane2.position.z=-0.11;
+			//CONVERTIR A CSG
+			var boxCSG = THREE.CSG.fromMesh( cube );
+			var sphereCSG = THREE.CSG.fromMesh( sphere );
+			var torusCSG = THREE.CSG.fromMesh(torus);
+			var boxCSGEspejo = THREE.CSG.fromMesh( cubeEspejo );
+			var cylinderCSGEspejo = THREE.CSG.fromMesh(cylinderEspejo);
+			//APLICAR LAS OPERACIONES
+			
+			var result = sphereCSG.intersect( boxCSG );
+			var resultadoEspejo = cylinderCSGEspejo.union(boxCSGEspejo);
+			
+			//CONVERTIR A THREE
+			var cube1 = THREE.CSG.toMesh( result );
+			cube1.material = material2;
+			cube1.translateZ(0.125);
+			var espejo = THREE.CSG.toMesh(resultadoEspejo);
+			var espejo2 = THREE.CSG.toMesh(resultadoEspejo);
+			espejo.material=materialChasis;
+			espejo2.material=materialChasis;
+			espejo.applyMatrix(t3);
+			espejo2.applyMatrix(t);
+			espejo.elementsNeedUpdate = true;
+			espejo2.elementsNeedUpdate = true;
+			espejo.position.z=-0.95;
+			espejo2.position.z=-2.55;
+			espejo.position.y=2.19;
+			espejo2.position.y=2.19;
+			espejo.position.x=1.4;
+			espejo2.position.x=1.4;
+			//APLICAR OPERACIONES Y VOLVER A THREE
+			var rin = THREE.CSG.fromMesh(cube1);
+			var ruedaCSG = torusCSG.union( rin );
+			var rueda = THREE.CSG.toMesh( ruedaCSG );
+			rueda.material = material3;
+			rueda.position.x=-3.75;
+			rueda.position.z=-0.1;
+			rueda.position.y=+0.1;
+			var rueda1 = rueda.clone();
+			rueda1.position.x = 3.5;
+			var rueda2 = rueda.clone();
+			rueda2.position.z = -3.4;
+			var rueda3 = rueda1.clone();
+			rueda3.position.z = -3.4;
+			
+			//Padre e Hijo
+			chasis.add(rueda);
+			chasis.add(rueda1);
+			chasis.add(rueda2);
+			chasis.add(rueda3);
+			chasis.add(ventana);
+			chasis.add(ventana2);
+			chasis.add(ventana3);
+			chasis.add(ventana4);
+			chasis.add(panoramico);
+			chasis.add(ventanaTrasera);
+			chasis.add(ventanaTrasera2);
+			chasis.add(peldaño);
+			chasis.add(espejo);
+			chasis.add(espejo2)
+			espejo.add(plane);
+			espejo2.add(plane2);
+			//AGREGAR A LA ESCENA LOS DIFERENTES ELEMENTOS
+			//scene.add(plane);
+			scene.add( chasis );
+			
+
+			camera.position.x = 10;
+			camera.position.y = 10;
+		  	camera.position.z = 5;
+			camera.lookAt( origin );
+		}
+		function animate(){
+			requestAnimationFrame( animate );
+			controls.update();
+			render();
+		}
+		function render(){
+			renderer.render( scene, camera );
+		}
+    </script>
+  </body>
+</html>
