@@ -60,8 +60,9 @@
             var pointLight = new THREE.PointLight( 0xffffff, .5, 100 );
             pointLight.position.set( 5, 1, -5 );
             scene.add( pointLight );
-			
-			var curvaChasis = []; //CURVA DEL CHASIS
+
+			//CURVA DEL CHASIS
+			var curvaChasis = []; 
                 curvaChasis[0] = new THREE.Vector2( 0, 0 );
                 curvaChasis[1] = new THREE.Vector2( -2.5 , 0 );
                 curvaChasis[2] = new THREE.Vector2( -3.2, 0.8);
@@ -83,13 +84,28 @@
                 curvaChasis[18] = new THREE.Vector2( 3.2, 2.10 );
                 curvaChasis[19] = new THREE.Vector2( 4.5, 1.5  );
 				curvaChasis[20] = new THREE.Vector2( 5.2, 0 );
-				curvaChasis[21] = new THREE.Vector2( 4.5, 0 );
-                curvaChasis[22] = new THREE.Vector2( 4.1, 0.7);
-                curvaChasis[23] = new THREE.Vector2( 3.5, 1);
-				curvaChasis[24] = new THREE.Vector2( 2.9, 0.7);
-                curvaChasis[25] = new THREE.Vector2( 2.6, 0 );
-				
-			var curvaVentana = []; //CURVA VENTANA
+				curvaChasis[21] = new THREE.Vector2( 4.8, 0 );
+                curvaChasis[22] = new THREE.Vector2( 4.3, 0.8);
+                curvaChasis[23] = new THREE.Vector2( 3.5, 1.2);
+				curvaChasis[24] = new THREE.Vector2( 2.8, 0.8);
+                curvaChasis[25] = new THREE.Vector2( 2.3, 0 );
+            
+			//CURVA DEL BUMPER
+			var curvaBumper = [];
+                curvaBumper[0] = new THREE.Vector2( 0, 0 );
+				curvaBumper[1] = new THREE.Vector2( 0.05, -0.05);
+				curvaBumper[2] = new THREE.Vector2( 0.15, 0 );
+				curvaBumper[3] = new THREE.Vector2( 0.20, 0.15 );
+				curvaBumper[4] = new THREE.Vector2( 0.20, 0.21 );
+				curvaBumper[5] = new THREE.Vector2( 0.15, 0.36 );
+				curvaBumper[6] = new THREE.Vector2( 0.05, 0.41);
+				curvaBumper[7] = new THREE.Vector2( 0, 0.36 );
+				curvaBumper[8] = new THREE.Vector2( 0.02, 0.21 );
+				curvaBumper[9] = new THREE.Vector2( 0.02, 0.15 );
+
+
+            //CURVA VENTANAS
+			var curvaVentana = []; 
                 curvaVentana[0] = new THREE.Vector2( 0, 0 );
                 curvaVentana[1] = new THREE.Vector2( 1.78, 0 );
                 curvaVentana[2] = new THREE.Vector2( 2, 0.300 );
@@ -158,6 +174,9 @@
 			shapeVentanasTraseras2.moveTo(0,0);
 			shapeVentanasTraseras2.splineThru(curvaVentanasTraseras2);
 			
+			var shapeBumper = new THREE.Shape(); 
+			shapeBumper .moveTo(0,0);
+			shapeBumper.splineThru(curvaBumper);
 			//EXTRUDE CHASIS
 			var extrudeSettings = {
 				steps: 2,
@@ -172,6 +191,16 @@
 			metalness: 0.5} );
 			var chasis = new THREE.Mesh( geoChasis, materialChasis ) ;
 			chasis.position.y=0.75;
+
+			var geoBumper = new THREE.ExtrudeGeometry( shapeBumper, extrudeSettings ); //GEOMETRIA DEL BUMPER
+			geoBumper.computeFaceNormals();
+			var materialBumper= new THREE.MeshStandardMaterial( { //MATERIAL DEL BUMPER
+			color: 0x898989, 
+			side:THREE.DoubleSide,
+			metalness: 0.5} );
+			var bumper = new THREE.Mesh( geoBumper, materialBumper ) ;
+			bumper.position.x = 5.21;
+			bumper.rotation.z = 0.3;
 			
 			var extrudeSettingsVentana = { //EXTRUDE VENTANAS
 				steps: 5,
@@ -283,11 +312,11 @@
 			ventanaTrasera2.position.z=-1.81;
 			
 			//CREAR LAS GEOMETRÍAS
-			var boxGeometry = new THREE.BoxGeometry( 0.9, 0.9, 0.11 );
-			var boxGeometry = new THREE.BoxGeometry( 0.9, 0.9, 0.11 );
-			var sphereGeometry = new THREE.SphereGeometry( .5, 32, 32 );
-			var torusGeometry = new THREE.TorusBufferGeometry( 0.55, 0.15, 20, 54 );
-			var boxGeometryPeldaño = new THREE.BoxGeometry( 5.6, 0.05, 4 );
+			var boxGeometry = new THREE.BoxGeometry( 1.2, 1.2, 0.11 );
+			var boxGeometry = new THREE.BoxGeometry( 1.2, 1.2, 0.11 );
+			var sphereGeometry = new THREE.SphereGeometry( .8, 32, 32 );
+			var torusGeometry = new THREE.TorusBufferGeometry( 0.7, 0.20, 20, 54 );
+			var boxGeometryPeldaño = new THREE.BoxGeometry( 4.6, 0.05, 4 );
 			var boxGeometryEspejo = new THREE.BoxGeometry( 0.8, 0.5, 0.2 );
 			var cylindergeometryEspejo = new THREE.CylinderBufferGeometry( 0.1, 0.1, 0.7 ,60 );
 			var planeGeometry = new THREE.PlaneGeometry( 0.6, 0.3, 32 );
@@ -296,6 +325,8 @@
 			var material2 = new THREE.MeshStandardMaterial( { color: colorG, metalness: 0.5, roughness: 0.1 } );
 			var material3 = new THREE.MeshStandardMaterial( { color: 0x141518, metalness: 0.5, roughness: 0.1 } );
 			var materialReflejo = new THREE.MeshStandardMaterial({ color: 0x8a9597, side:THREE.DoubleSide } );
+			var materialgb = new THREE.MeshStandardMaterial( { color : 0x053c75 } );
+			var materialFarolas = new THREE.MeshStandardMaterial( { color : 0xFFED95 } );
 			//CREAR LAS MALLAS
 			var cube = new THREE.Mesh( boxGeometry, material1 );
 			var sphere = new THREE.Mesh( sphereGeometry, material2 );
@@ -345,6 +376,7 @@
 			espejo2.position.y=2.19;
 			espejo.position.x=1.4;
 			espejo2.position.x=1.4;
+
 			//APLICAR OPERACIONES Y VOLVER A THREE
 			var rin = THREE.CSG.fromMesh(cube1);
 			var ruedaCSG = torusCSG.union( rin );
@@ -359,7 +391,209 @@
 			rueda2.position.z = -3.4;
 			var rueda3 = rueda1.clone();
 			rueda3.position.z = -3.4;
+
+            //CURVAS GUARDABARROS
+			var curve1 = new THREE.CubicBezierCurve3(
+                new THREE.Vector3(  5.0, 0.64, -0.1),
+				new THREE.Vector3(  4.2, 2.80, -0.1 ),
+                new THREE.Vector3(  3, 2.80, -0.1 ),
+				new THREE.Vector3(  2, 0.50, -0.1 ),
+            );
+
+			var curve2 = new THREE.CubicBezierCurve3(
+                new THREE.Vector3(  5.0, 0.64, 0.4 ),
+				new THREE.Vector3( 4.2, 2.60, 0.4 ),
+                new THREE.Vector3( 3, 2.60, 0.4 ),
+                new THREE.Vector3(  2, 0.50, 0.4 ),
+            );
+			var curve3 = new THREE.CubicBezierCurve3(
+                new THREE.Vector3(  5.0, 0.64, 0.4 ),
+				new THREE.Vector3( 4.2, 2.60, 0.4 ),
+                new THREE.Vector3( 3, 2.60, 0.4 ),
+                new THREE.Vector3(  2, 0.50, 0.4 ),
+            );
+			var curve4 = new THREE.CubicBezierCurve3(
+                new THREE.Vector3(  5.0, 0.64, 0.7 ),
+				new THREE.Vector3( 4.2, 2, 0.7),
+                new THREE.Vector3( 3, 2, 0.7),
+                new THREE.Vector3(  2, 0.60, 0.7 ),
+            );
+
+			var pointGeometry = new THREE.Geometry();
+			var pointGeometry2 = new THREE.Geometry();
+            for(var i=0; i<20; i++){
+                var point = curve1.getPoint( i/20 );
+                pointGeometry.vertices.push( point );
+            }
+            
+            for(var i=0; i<20; i++){
+                var point = curve2.getPoint( i/20 );
+                pointGeometry.vertices.push( point );
+            }
+
+			for(var i=0; i<20; i++){
+                var point = curve3.getPoint( i/20 );
+                pointGeometry2.vertices.push( point );
+            }
+			for(var i=0; i<20; i++){
+                var point = curve4.getPoint( i/20 );
+                pointGeometry2.vertices.push( point );
+            }
+
+            var pointMaterial = new THREE.PointsMaterial( { color: 0x0053c75 } );
+            var curvePoints = new THREE.Points( pointGeometry, pointMaterial );
+            
+            
+            materialgb.side = THREE.DoubleSide;
+            for(var i=0; i<19; i++){
+                var face1 = new THREE.Face3( i, i+1, i+20 );
+                pointGeometry.faces.push( face1 );
+                var face2 = new THREE.Face3( i+1, i+20, i+21 );
+                pointGeometry.faces.push( face2 );
+            }
+			for(var i=0; i<19; i++){
+                var face3 = new THREE.Face3( i, i+1, i+20 );
+                pointGeometry2.faces.push( face3 );
+                var face4 = new THREE.Face3( i+1, i+20, i+21 );
+                pointGeometry2.faces.push( face4 );
+            }
+            pointGeometry.computeFaceNormals();
+			pointGeometry2.computeFaceNormals();
+			var guarda1 = new THREE.Mesh( pointGeometry, materialgb );
+            var guarda2 = new THREE.Mesh( pointGeometry2, materialgb );
+
+			//ROTACIONES Y TRASLACIONES PARA UBICAR LOS GUARDA BARROS
+			guarda1.position.y = -0.8;
+            guarda2.position.y = -0.8;
+            var guarda3 = guarda1.clone();
+			var guarda4 = guarda2.clone();
+			var angulorad5 = (180*Math.PI)/180; 
+			var cos5 = Math.cos(angulorad5); 
+			var sen5 = Math.sin(angulorad5);
+			var rt1 = new THREE.Matrix4();
+			rt1.set(	cos5,0,sen5,0,
+					0,1,0,0,
+					-sen5,0,cos5,0,
+					0,0,0,1		);
+					guarda3.applyMatrix(rt1);
+					guarda4.applyMatrix(rt1);
+					guarda3.elementsNeedUpdate = true;
+					guarda4.elementsNeedUpdate = true;
+					var angulorad5 = (-5*Math.PI)/180; 
+			var cosp = Math.cos(angulorad5); 
+			var senp = Math.sin(angulorad5);
+			var rt2 = new THREE.Matrix4();
+			rt2.set(	cosp,-senp,0,0,
+					senp,cosp,0,0,
+					0,0,1,0,
+					0,0,0,1		);
+					guarda3.applyMatrix(rt2);
+					guarda4.applyMatrix(rt2);
+					guarda3.elementsNeedUpdate = true;
+					guarda4.elementsNeedUpdate = true;
+			guarda3.translateZ(3.5);
+			guarda4.translateZ(3.5);
+		    guarda3.translateX(-7.15);
+			guarda4.translateX(-7.15);
+			guarda3.translateY(-0.55);
+			guarda4.translateY(-0.55);
+
+			var guarda5 = guarda1.clone();
+			var guarda6 = guarda2.clone();
+
+			guarda5.translateX(-7.25);
+			guarda6.translateX(-7.25);
+			guarda5.rotation.z = 0.08;
+			guarda6.rotation.z = 0.08;
+			guarda5.position.y = -1.05;
+			guarda6.position.y = -1.05;
+
+			var guarda7 = guarda3.clone();
+			var guarda8 = guarda4.clone();
+			guarda7.translateX(7.3);
+			guarda8.translateX(7.3);
+			guarda7.position.y = -1.1;
+			guarda8.position.y = -1.1;
 			
+			
+			//FAROLAS
+			var box = new THREE.BoxGeometry( 1, 1, 0.25 );
+			var sphere = new THREE.SphereGeometry( .44, 32, 32 );
+			var cube1 = new THREE.Mesh( box, materialFarolas );
+			var sphere1 = new THREE.Mesh( sphere, materialFarolas );
+			cube1.position.z = 3;
+			sphere1.position.z = 2.52;
+			var boxCSG1 = THREE.CSG.fromMesh( cube1 );
+			var sphereCSG1 = THREE.CSG.fromMesh( sphere1 );
+			var result1 = sphereCSG1.intersect( boxCSG1 );
+			var farola = THREE.CSG.toMesh( result1 );
+			farola.material = materialFarolas;
+			//ROTACIÓN DE LAS FAROLAS
+			var angulorad90 = (80*Math.PI)/180; 
+			var cosf = Math.cos(angulorad90); 
+			var senf = Math.sin(angulorad90);
+			var rt3 = new THREE.Matrix4();
+			rt3.set(	cosf,0,senf,0,
+					0,1,0,0,
+					-senf,0,cosf,0,
+					0,0,0,1		);
+					farola.applyMatrix(rt3);
+					farola.elementsNeedUpdate = true;
+			var angulora5 = (40*Math.PI)/180; 
+			var cospl = Math.cos(angulora5); 
+			var senpl = Math.sin(angulora5);
+			var rt4 = new THREE.Matrix4();
+			rt4.set(	cospl,-senpl,0,0,
+					senpl,cospl,0,0,
+					0,0,1,0,
+					0,0,0,1		);
+					farola.applyMatrix(rt4);
+					farola.elementsNeedUpdate = true;
+
+			farola.translateZ(1.05);
+			farola.translateX(0.4);
+			farola.translateY(-2.1);
+
+			farola2 = farola.clone();
+			farola2.position.z = -4.2;
+
+            
+			//FAROLAS TRASERAS
+			var geometriacubo = new THREE.BoxGeometry( 0.5, 0.55, 0.5);;
+            var cube23 = new THREE.Mesh( geometriacubo, materialFarolas );
+            cube23.position.z = 1;
+			cube23.position.x = -0.1;
+			cube23.position.y = -0.17;
+			cube23.rotation.z = 0.78; 
+
+			var geometry = new THREE.CylinderGeometry( 0.2, 0.2, 0.35, 32 );
+            var cylinder = new THREE.Mesh( geometry, materialFarolas );
+			cylinder.position.z = 1;
+			cylinder.position.x = 0.1;
+			cylinder.rotation.z = Math.PI/2;
+			var boxCSGg = THREE.CSG.fromMesh( cube23 );
+			var sphereCSGg = THREE.CSG.fromMesh( cylinder );
+			var result23 = sphereCSGg.subtract( boxCSGg );
+			var farolatras = THREE.CSG.toMesh( result23 );
+            farolatras.rotation.y = Math.PI;
+			farolatras.position.z = 1.3;
+			farolatras.position.x = -4.48;
+			farolatras.position.y = 0.95;
+			farolatras.rotation.z = -0.1;
+			farolatras.material = materialFarolas;
+
+			farolatras1 = farolatras.clone();
+			farolatras1.position.z = -2.8;
+			farolatras1.translateX(-0.09);
+            
+			//ROTACION DEL BUMPER TRASERO
+			bumperb = bumper.clone(); 
+			bumperb.rotation.z = 2.75; 
+			bumperb.position.x = -5.65;
+			bumperb.position.y = 0.47;          
+
+
+
 			//Padre e Hijo
 			chasis.add(rueda);
 			chasis.add(rueda1);
@@ -377,6 +611,20 @@
 			chasis.add(espejo2)
 			espejo.add(plane);
 			espejo2.add(plane2);
+			chasis.add(guarda1);
+			chasis.add(guarda2);
+			chasis.add(guarda3);
+			chasis.add(guarda4);
+			chasis.add(guarda5);
+			chasis.add(guarda6);
+			chasis.add(guarda7);
+			chasis.add(guarda8);
+			chasis.add(farola);
+			chasis.add(farola2);
+			chasis.add( farolatras );
+			chasis.add( farolatras1 );
+			chasis.add(bumper);
+			chasis.add(bumperb);
 			//AGREGAR A LA ESCENA LOS DIFERENTES ELEMENTOS
 			//scene.add(plane);
 			scene.add( chasis );
@@ -387,6 +635,7 @@
 		  	camera.position.z = 5;
 			camera.lookAt( origin );
 		}
+
 		function animate(){
 			requestAnimationFrame( animate );
 			controls.update();
