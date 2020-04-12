@@ -7,12 +7,20 @@
     </style>
   </head>
   <body>
+	
     <script src="js/three.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
 	<script src="js/csg.js"></script>
 	<script src="js/THREE.CSG.js"></script>
     <script>
 		var scene, aspect, camera, renderer, controls;
+		var chasis;
+		var W = false;
+		var S = false;
+		var Q = false;
+		var E = false;
+		var A = false;
+		var D = false;
 		init();
 		animate();
 		function init(){
@@ -60,6 +68,54 @@
             var pointLight = new THREE.PointLight( 0xffffff, .5, 100 );
             pointLight.position.set( 5, 1, -5 );
             scene.add( pointLight );
+			
+			 var onKeyDown = function ( event ) {
+				switch ( event.keyCode ) {
+					case 87: 
+						W = true;
+						break;
+					case 83: 
+						S = true;
+						break;
+					case 81:
+						Q = true;
+						break;	
+					case 69:
+						E = true;
+						break;
+					case 65:
+						A = true;
+						break;
+					case 68:
+						D = true;
+						break;
+						}
+						};
+			var onKeyUp = function ( event ) {
+				switch ( event.keyCode ) {
+					case 87:
+						W = false;
+						break;
+					case 83:
+						S = false;
+						break;
+					case 81:
+						Q = false;
+						break;
+					case 69:
+						E = false;
+						break;
+					case 65:
+						A = false;
+						break;
+					case 68:
+						D = false;
+						break;
+						}
+						};
+			
+			document.addEventListener( 'keydown', onKeyDown, false );
+			document.addEventListener( 'keyup', onKeyUp, false );
 
 			//CURVA DEL CHASIS
 			var curvaChasis = []; 
@@ -189,7 +245,7 @@
 			color: 0x053c75, 
 			side:THREE.DoubleSide,
 			metalness: 0.5} );
-			var chasis = new THREE.Mesh( geoChasis, materialChasis ) ;
+			chasis = new THREE.Mesh( geoChasis, materialChasis ) ;
 			chasis.position.y=0.75;
 
 			var geoBumper = new THREE.ExtrudeGeometry( shapeBumper, extrudeSettings ); //GEOMETRIA DEL BUMPER
@@ -642,7 +698,25 @@
 			render();
 		}
 		function render(){
-			renderer.render( scene, camera );
+		if(W){
+		chasis.position.x+=0.2;
+		}
+		if(S){
+		chasis.position.x-=0.2;
+		}
+		if(Q){
+		chasis.rotation.y+=0.05;
+		}
+		if(E){
+		chasis.rotation.y-=0.05;
+		}
+		if(D){
+		chasis.position.z-=0.5;
+		}
+		if(A){
+		chasis.position.z+=0.5;
+		}
+		renderer.render( scene, camera );
 		}
     </script>
   </body>
