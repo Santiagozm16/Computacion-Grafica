@@ -1,18 +1,20 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
-    <title>Camaras brazo</title> 
+    <title>Cámaras</title>
+	  
     <style>
       html, body { margin: 0; padding: 0; overflow: hidden; }
     </style>
   </head>
   <body>
-        <div id="info">Camaras brazo<br/>
+  <!-- <div id="info">Camaras<br/>
             Usar teclas 'W','A','S','D' para transladar la base<br/>
 			Usar flechas para rotar la primera esfera</br>
 			Usar teclas 8 y 2 para subir o bajar la garra.<br/>
 			Usar teclas 4 y 6 para girar la garra.<br/>
-        </div>
+			Integrantes: Alejandra Pedraza y Andrés Santiago Rodriguez<br/>
+        </div> -->
     <script src="js/three.min.js"></script>
     <script src="js/controls/OrbitControls.js"></script>
     <script src='js/libs/dat.gui.min.js'></script>
@@ -212,10 +214,10 @@
 						break;
 				}
 			};	  	
-			
+			console.log(window.innerHeight);
 			document.addEventListener( 'keydown', onKeyDown, false );
 			document.addEventListener( 'keyup', onKeyUp, false );
-			var size = 10;
+			var size = 18;
 			var arrowSize = 1;
 			var divisions = size;
 			var origin = new THREE.Vector3( 0, 0, 0 );
@@ -238,24 +240,14 @@
             gridHelperXY.rotateOnWorldAxis ( x, THREE.Math.degToRad(90) );
             gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
             gridHelperYZ.rotateOnWorldAxis ( z, THREE.Math.degToRad(90) );
-            
-            //CREAR LAS FLECHAS QUE INDICAN LOS EJES DE COORDENADAS 3D
-            var arrowX = new THREE.ArrowHelper( x, origin, arrowSize, colorR );
-            var arrowY = new THREE.ArrowHelper( y, origin, arrowSize, colorG );
-            var arrowZ = new THREE.ArrowHelper( z, origin, arrowSize, colorB );
-            
-			
+            	
 			//CREAR LAS GEOMETRÍAS
 			//Far plane
-			var width = 30;
-			var height = 15;
-			var FOV = 45.0;			//Ángulo de apertura
-			var sinFOV = Math.sin((FOV/2.0)*Math.PI/180.0);
-			var aR = width/height;	//AspectRatio
+			var width = 19;
+			var height = 16.5;
 			var nearZ = 1;
 			var farZ = 100;
-			var COA = new THREE.Vector3(-5,2,0);
-			var planeGeometry = new THREE.PlaneGeometry(width, height);
+
             
             camera2 = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, nearZ, farZ );
             var helper = new THREE.CameraHelper( camera2 );
@@ -280,29 +272,30 @@
 			var boxGeometry = new THREE.BoxGeometry(1,2,1);
 				
 			//CREAR LOS MATERIALES
-            var matLinea = new THREE.LineBasicMaterial( { color: 0xFFE4C4 } );
+            var matLinea = new THREE.LineBasicMaterial( { color: 0x767676} );
 			var matEs = new THREE.LineBasicMaterial( { color: 0x333366 } );
-			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xcb3234 });
+			var matPrueba = new THREE.LineBasicMaterial ( {color: 0xDF782C});
 			
 			//objetos para la escena.
 			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 			var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
 			var cub = new THREE.Mesh( geometry, material );
+			var geometry = new THREE.SphereBufferGeometry( 1, 32, 32 );
+            var material = new THREE.MeshBasicMaterial( {color: 0xFEEB00} );
+            var sol = new THREE.Mesh( geometry, material );
 			var geometry = new THREE.ConeBufferGeometry( 1, 1, 32 );
 			var cone = new THREE.Mesh( geometry, matLinea );
 			var geometry = new THREE.CylinderBufferGeometry( 1, 1, 1, 32 );
 			var cylinder = new THREE.Mesh( geometry, matPrueba );
 			//objetos brazo
-			base = new THREE.Line( Cilindro(1.5, 2,25) , matLinea );
+			base = new THREE.Line( Cilindro(1.5, 2,200) , matLinea );
 			espr = new THREE.Line( Espiral(2.01,1.5), matLinea );
 			esf1 = new THREE.Line( Esfera(1), matLinea );
 			esf2 = new THREE.Line( Esfera(1), matLinea );
-			cil1 = new THREE.Line( Cilindro(3,1,50), matPrueba);
-			cil2 = new THREE.Line( Cilindro(3.5,1,50), matPrueba);
-			con0 = new THREE.Line(Cono(2,2,50), matPrueba);
+			cil1 = new THREE.Line( Cilindro(3,1,200), matPrueba);
+			cil2 = new THREE.Line( Cilindro(3.5,1,200), matPrueba);
+			con0 = new THREE.Line(Cono(2,2,200), matPrueba);
 			//UBICACIÓN EN EL ESPACIO DE LOS OBJETOS
-			//base.position.z = -20;
-			//base.position.y= -2;
 			esf1.applyMatrix( new THREE.Matrix4().makeTranslation(0,1.2,0) );
 			cil1.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.2,0));
 			esf1.rotation.z = 0.8;
@@ -312,7 +305,8 @@
 			cil2.applyMatrix( new THREE.Matrix4().makeTranslation(0,0.3,0.1));
 			esf2.rotation.z = 0.7;
 			//Ubicar objetos
-			cub.position.z=4.5;
+			sol.position.y = 30;
+			cub.position.z=-8.5;
 			cub.position.x=-4.5;
 			cub.position.y=0.5;
 			cone.position.z=1;
@@ -340,16 +334,14 @@
 			camera.position.z = 0;
 			console.log(camera.matrix);
 			//CREAR LOS OBJETOS
-            //scene.add( arrowX );
-            //scene.add( arrowY );
-            //scene.add( arrowZ );
             scene.add(base);
 			scene.add(cub);
+            scene.add(sol);
 			scene.add( cone );
 			scene.add( cylinder );
 			scene.add( gridHelperXZ );
 			//scene.add( helper4 );
-		  	//camera.lookAt( origin );
+
             
            
 		}
@@ -359,12 +351,30 @@
 			render();
 		}
         function render() {
-	    camera.rotation.x=Math.PI/2;
-		if(upArrow){
+	        camera.rotation.x=Math.PI/2;
+			camera.rotation.z=-Math.PI/2;
+		    moverBrazo();
+            renderer.setViewport( 0, 0, w, h );
+            renderer.setScissor( 0, 0, w, h );
+            renderer.render( scene, camera2 );
+			renderer.setViewport( w, 0, w, h );
+            renderer.setScissor( w, 0, w, h );
+            renderer.render( scene, camera3 );
+			renderer.setViewport( 2*w, 0, w, h );
+            renderer.setScissor( 2*w, 0, w, h );
+            renderer.render( scene, camera4 );
+            renderer.setViewport( 0, h, 3*w, h );
+            renderer.setScissor( 0,   h ,  3*w, h );
+            renderer.setScissorTest( true );
+			
+            renderer.render( scene, camera );
+		}
+		function moverBrazo(){
+			if(downArrow){
 		if(esf1.rotation.z<1)
 		esf1.rotation.z += 0.1;
 		}
-		if(downArrow){
+		if(upArrow){
 		if(esf1.rotation.z>-0.6)
 		esf1.rotation.z -= 0.1;
 		}
@@ -390,36 +400,22 @@
 		esf2.rotation.y -= 0.1;
 		}
 		if(trans1){
-		if(base.position.x>-3.50)
+		if(base.position.x>-6.50)
 		base.position.x -=0.1;
 		}
 		if(trans2){
-		if(base.position.x<2.90)
+		if(base.position.x<8.90)
 		base.position.x +=0.1;
 		}
 		if(trans3){
-		if(base.position.z>-4)
+		if(base.position.z>-8)
 		base.position.z -=0.1;
 		}
 		if(trans4){
-		if(base.position.z<3.05)
+		if(base.position.z<6.05)
 		base.position.z +=0.1;
 		}
-            renderer.setViewport( 0, 0, w, h );
-            renderer.setScissor( 0, 0, w, h );
-            renderer.render( scene, camera2 );
-			renderer.setViewport( w, 0, w, h );
-            renderer.setScissor( w, 0, w, h );
-            renderer.render( scene, camera3 );
-			renderer.setViewport( 2*w, 0, w, h );
-            renderer.setScissor( 2*w, 0, w, h );
-            renderer.render( scene, camera4 );
-            renderer.setViewport( 10, mapHeight - 10, mapWidth, mapHeight );
-            renderer.setScissor( 0,   mapHeight ,  mapWidth, mapHeight );
-            renderer.setScissorTest( true );
-			
-            renderer.render( scene, camera );
-		}
+	}
     </script>
   </body>
 </html>

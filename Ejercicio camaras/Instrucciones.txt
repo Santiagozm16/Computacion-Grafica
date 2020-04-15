@@ -1,0 +1,5 @@
+Usar teclas 'W','A','S','D' para transladar la base
+Usar flechas para rotar la primera esfera
+Usar teclas 8 y 2 para subir o bajar la garra.
+Usar teclas 4 y 6 para girar la garra.
+Integrantes: Alejandra Pedraza y Andrés Santiago Rodriguez
