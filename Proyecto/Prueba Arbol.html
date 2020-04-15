@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dark</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <script src="js/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
+    <script>
+	
+		var scene, aspect, camera, renderer, controls;
+		var nodo = new THREE.SphereGeometry( 0.5, 32, 32 ); //GEOMETRYA PARA LAS ESFERAS
+		var nodos = new Array(); //ARRAY DONDE SE GUARDA CADA UNA DE LAS ESFERAS 
+		init();
+		animate();
+		
+		function arbol(NumG, arregloF){ //CREACION DE ESFERAS TOTALES
+			for (var i = 0; i<= NumG; i++){
+				for(var j = 0; j< arregloF[i];j++){
+				var material = new THREE.MeshBasicMaterial( {  color: Math.random() * 0xe0e0e0, opacity: 0.8 } );
+				var bolita = new THREE.Mesh( nodo, material );
+				nodos.push(bolita);
+				}
+			}
+			var aux = 0; 
+			for(var a = 0; a<arregloF[0]+1;a++){ //UBICAR ESFERAS GENERACION 1
+			if(a<arregloF[0]){
+			nodos[a].position.x= 2*a
+			aux = aux + 1;}
+			}
+			//console.log(aux + " aux");
+			for(var m = 0; m < arregloF[1] ; m=m+1){ //UBICAR ESFERAS GENERACION 2
+			//console.log(aux + " aux");
+			nodos[aux].position.y = -2;
+			nodos[aux].position.x = 2*m;
+			//console.log(aux+m + " aux+m");
+			aux = aux +1;
+			}
+			console.log(aux);
+			for(var t = 0; t<arregloF[2];t++){ //UBICAR ESFERAS GENERACION 3
+			nodos[aux+t].position.y = -4;
+			nodos[aux+t].position.x = 2*t;
+			}
+			aux = aux + arregloF[2];
+			//console.log(aux);
+			for(var t = 0; t<arregloF[3];t++){ //UBICAR ESFERAS GENERACION 4
+			nodos[aux+t].position.y = -6;
+			nodos[aux+t].position.x = 2*t;
+			}
+			//JERARQUIA PARA LAS ESFERAS DEL ARBOL
+			nodos[0].add(nodos[8]);
+			nodos[0].add(nodos[7]);
+			nodos[0].add(nodos[6]);
+			nodos[0].add(nodos[5]);
+			nodos[0].add(nodos[4]);
+			nodos[0].add(nodos[3]);
+			nodos[0].add(nodos[2]);
+			nodos[0].add(nodos[1]);
+			// CREACIOÓN DE LA LINEA
+			var material2 = new THREE.LineBasicMaterial( { color: 0x0000ff });
+			var points = [];
+			for(var re = 0; re<nodos.length;re++){
+			var vector = new THREE.Vector3( nodos[re].position.x, nodos[re].position.y, 0 );
+			points.push(vector);
+			}
+			var geometry2 = new THREE.BufferGeometry().setFromPoints( points );
+			var line = new THREE.Line( geometry2, material2 );
+			nodos[0].add( line ); //RELACIONAR LA LINEA CON LAS ESFERAS (PADRE E HIJO)
+			nodos[0].position.y = 3;
+			scene.add(nodos[0]);
+		}
+		function init(){
+			//INICIALIZACIÓN
+	        scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xFFFFFF );
+	        aspect = window.innerWidth / window.innerHeight;
+	        camera = new THREE.PerspectiveCamera( 75, aspect, 0.1, 1000);
+	        renderer = new THREE.WebGLRenderer({antialias: true});
+	        renderer.setSize( window.innerWidth, window.innerHeight );
+	        document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			
+			//ELEMENTOS COMUNES
+			var size = 10;
+			var arrowSize = 1;
+			var divisions = size;
+			var origin = new THREE.Vector3( 0, 0, 0 );
+			var x = new THREE.Vector3( 1, 0, 0 );
+			var y = new THREE.Vector3( 0, 1, 0 );
+		  	var z = new THREE.Vector3( 0, 0, 1 );
+		  	var color = new THREE.Color( 0x333333 );
+		  	var colorR = new THREE.Color( 0xAA3333 );
+		  	var colorG = new THREE.Color( 0x33AA33 );
+		  	var colorB = new THREE.Color( 0x333366 );
+			
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+			//scene.add( axesHelper );
+			
+			var arreglo1 = [1,2,3,3]; //ARREGLO DONDE SE PONE LA CANTIDAD DE MIEMBROS POR CADA GENERACIÓN
+			var array = new Array();
+			arbol(4,arreglo1); //LLAMADO A LA FUNCIÓN DEL ARBOL
+		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color, color );
+			//scene.add( gridHelperXZ );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+
+			camera.position.x = 2;
+			camera.position.y = 0;
+		  	camera.position.z = 10;
+			camera.lookAt( origin );
+		}
+
+		function animate(){
+			requestAnimationFrame( animate );
+			controls.update();
+			render();
+		}
+		function render(){
+			renderer.render( scene, camera );
+		}
+    </script>
+  </body>
+</html>
