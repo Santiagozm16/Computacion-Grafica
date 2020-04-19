@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Figura 2</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <script src="js/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/csg.js"></script>
+	<script src="js/THREE.CSG.js"></script>
+    <script>
+		var scene, aspect, camera, renderer, controls;
+		init();
+		animate();
+		function init(){
+			//INICIALIZACIÓN
+	        scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xf0f0f0 );
+	        aspect = window.innerWidth / window.innerHeight;
+	        camera = new THREE.PerspectiveCamera( 75, aspect, 0.1, 2000);
+			camera.position.set( 500/4, 800/4, 1300/4 );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+	        renderer.setSize( window.innerWidth, window.innerHeight );
+	        document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			
+			//ELEMENTOS COMUNES
+			var size = 1000;
+			var arrowSize = 1;
+			var divisions = size;
+			var origin = new THREE.Vector3( 0, 0, 0 );
+			var x = new THREE.Vector3( 1, 0, 0 );
+			var y = new THREE.Vector3( 0, 1, 0 );
+		  	var z = new THREE.Vector3( 0, 0, 1 );
+		  	var color = new THREE.Color( 0x333333 );
+		  	var colorR = new THREE.Color( 0xAA3333 );
+		  	var colorG = new THREE.Color( 0x33AA33 );
+		  	var colorB = new THREE.Color( 0x333366 );
+			
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+			//scene.add( axesHelper );
+			
+		  	var gridHelperXZ = new THREE.GridHelper( size, 10, color, color );
+			//scene.add( gridHelperXZ );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+
+            //CREAR ILUMINACIÓN
+            var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+            scene.add( ambient );
+			
+            var pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
+            pointLight.position.set( -20, 40, 50 );
+            scene.add( pointLight );
+			
+            var pointLight = new THREE.PointLight( 0xffffff, .5, 100 );
+            pointLight.position.set( 20, 40, -50 );
+            scene.add( pointLight );
+			
+			//CREAR LAS GEOMETRÍAS
+			var boxGeometryFig2 = new THREE.BoxGeometry( 50, 40, 50 );
+			var boxGeometryFig2_2 = new THREE.BoxGeometry( 50, 50, 50 );
+			var cylinderGeometryFig2 = new THREE.CylinderGeometry( 8, 8, 10, 32 );
+						
+			//CREAR LOS MATERIALES
+            var materialR = new THREE.MeshStandardMaterial( { color: colorR, metalness: 0.5, roughness: 0.1 } );
+			var materialG = new THREE.MeshStandardMaterial( { color: colorG, metalness: 0.5, roughness: 0.1 } );
+			var materialB = new THREE.MeshStandardMaterial( { color: colorB, metalness: 0.5, roughness: 0.1 } );
+			
+			//CREAR LAS MALLAS
+			var cajaFig2 = new THREE.Mesh(boxGeometryFig2,materialR);
+			var cajaFig2_2 = new THREE.Mesh(boxGeometryFig2_2,materialB);
+			var cilindroFig2 = new THREE.Mesh(cylinderGeometryFig2,materialG);
+			var cilindroFig2_2 = new THREE.Mesh(cylinderGeometryFig2,materialG);
+
+			cilindroFig2.translateX( -50/4 );
+			cilindroFig2.translateY( 40/2+5 );
+			cilindroFig2.translateZ( 50/4 );
+			cilindroFig2_2.translateX( -50/4 );
+			cilindroFig2_2.translateY( 40/2+5 );
+			cilindroFig2_2.translateZ( -50/4 );
+			cajaFig2_2.translateX( 50/1.5 );
+			cajaFig2_2.translateY( 40/2 );
+			cajaFig2_2.rotation.z = 0.785398;
+			
+			//CONVERTIR A CSG
+			var boxFig2CSG = THREE.CSG.fromMesh( cajaFig2 );
+			var boxFig2_2CSG = THREE.CSG.fromMesh( cajaFig2_2 );
+			var cylinderFig2CSG = THREE.CSG.fromMesh( cilindroFig2 );
+			var cylinderFig2_2CSG = THREE.CSG.fromMesh( cilindroFig2_2 );
+			
+			//APLICAR LAS OPERACIONES
+			
+			var Fig2 = cylinderFig2CSG.union(cylinderFig2_2CSG.union(boxFig2CSG.subtract(boxFig2_2CSG)));
+			
+			//CONVERTIR A THREE
+			var Ficha_2 = THREE.CSG.toMesh( Fig2 );
+			Ficha_2.material = materialR;
+			
+			
+			//AGREGAR A LA ESCENA LOS DIFERENTES ELEMENTOS
+			//scene.add( cajaFig2 );
+			//scene.add(cajaFig2_2);
+			//scene.add(cilindroFig2);
+			//scene.add(cilindroFig2_2);
+			scene.add(Ficha_2);
+			camera.lookAt( origin );
+		}
+		function animate(){
+			requestAnimationFrame( animate );
+			controls.update();
+			render();
+		}
+		function render(){
+			renderer.render( scene, camera );
+		}
+    </script>
+  </body>
+</html>
