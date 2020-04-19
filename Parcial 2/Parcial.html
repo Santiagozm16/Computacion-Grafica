@@ -16,6 +16,8 @@
   <body>
   <div id="info">Parcial<br/>
             Presentado por: Andrés Santiago Rodríguez Prada<br/>
+			El programa cuenta con 5 tipos de fichas, presione una tecla
+			del 1 al 5 para escoger una ficha diferente<br/>
         </div>
     <script src="js/three.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
@@ -26,8 +28,122 @@
 		var plane;
 		var mouse, raycaster, isShiftDown = false;
 		var rollOverMesh, rollOverMaterial;
-		var cubeGeo, cubeMaterial;
+		var uno = true; 
+		var dos = false;
+		var tres = false;
+		var cuatro = false;
+		var cinco = false;
 		var objects = [];
+		//MATERIALES
+			var materialR = new THREE.MeshStandardMaterial( { color: 0xAA3333, metalness: 0.5, roughness: 0.1 } );
+			var materialG = new THREE.MeshStandardMaterial( { color: 0x33AA33, metalness: 0.5, roughness: 0.1 } );
+			var materialB = new THREE.MeshStandardMaterial( { color: 0x333366, metalness: 0.5, roughness: 0.1 } );
+			var materialY = new THREE.MeshStandardMaterial( { color: 0xFFCC00, metalness: 0.5, roughness: 0.1 } );
+			var materialS = new THREE.MeshStandardMaterial( { color: 0xFF9966, metalness: 0.5, roughness: 0.1 } );
+		//GEOMETRIAS
+			var boxGeometryFig1 = new THREE.BoxGeometry( 50, 40, 50 );
+			var cylinderGeometryFig1 = new THREE.CylinderGeometry( 8, 8, 10, 32 );
+			var boxGeometryFig2 = new THREE.BoxGeometry( 50, 40, 50 );
+			var boxGeometryFig2_2 = new THREE.BoxGeometry( 50, 50, 50 );
+			var cylinderGeometryFig2 = new THREE.CylinderGeometry( 8, 8, 10, 32 );
+			var cylinderGeometryFig3 = new THREE.CylinderGeometry( 25, 25, 30, 32 );
+			var cylinderGeometryFig3_2 = new THREE.CylinderGeometry( 18, 18, 10, 32 );
+			var cylinderGeometryFig3_3 = new THREE.CylinderGeometry( 21, 21, 10, 32 );
+			var cylinderGeometryFig3_4 = new THREE.CylinderGeometry( 14, 18, 50, 32 );
+			var cylinderGeometryFig4 = new THREE.CylinderGeometry( 25, 25, 40, 32 );
+			var cylinderGeometryFig4_2 = new THREE.CylinderGeometry( 18, 18, 10, 32 );
+			var cylinderGeometryFig4_3 = new THREE.CylinderGeometry( 14, 18, 50, 32 );
+			var boxGeometryFig5 = new THREE.BoxGeometry( 50, 40, 50 );
+			var cylinderGeometryFig5 = new THREE.CylinderGeometry( 25/2, 25/2, 10, 32 );
+		//CREAR LAS MALLAS
+			var cajaFig1 = new THREE.Mesh(boxGeometryFig1,materialR);
+			var cilindroFig1 = new THREE.Mesh(cylinderGeometryFig1,materialG);
+			var cilindroFig1_2 = new THREE.Mesh(cylinderGeometryFig1,materialG);
+			var cilindroFig1_3 = new THREE.Mesh(cylinderGeometryFig1,materialG);
+			var cilindroFig1_4= new THREE.Mesh(cylinderGeometryFig1,materialG);
+			cilindroFig1.translateX( 50/4 );
+			cilindroFig1.translateY( 40/2+5 );
+			cilindroFig1.translateZ( 50/4 );
+			cilindroFig1_2.translateX( -50/4 );
+			cilindroFig1_2.translateY( 40/2+5 );
+			cilindroFig1_2.translateZ( 50/4 );
+			cilindroFig1_3.translateX( -50/4 );
+			cilindroFig1_3.translateY( 40/2+5 );
+			cilindroFig1_3.translateZ( -50/4 );
+			cilindroFig1_4.translateX( 50/4 );
+			cilindroFig1_4.translateY( 40/2+5 );
+			cilindroFig1_4.translateZ( -50/4 );
+			var cajaFig2 = new THREE.Mesh(boxGeometryFig2,materialR);
+			var cajaFig2_2 = new THREE.Mesh(boxGeometryFig2_2,materialB);
+			var cilindroFig2 = new THREE.Mesh(cylinderGeometryFig2,materialG);
+			var cilindroFig2_2 = new THREE.Mesh(cylinderGeometryFig2,materialG);
+			cilindroFig2.translateX( -50/4 );
+			cilindroFig2.translateY( 40/2+5 );
+			cilindroFig2.translateZ( 50/4 );
+			cilindroFig2_2.translateX( -50/4 );
+			cilindroFig2_2.translateY( 40/2+5 );
+			cilindroFig2_2.translateZ( -50/4 );
+			cajaFig2_2.translateX( 50/1.5 );
+			cajaFig2_2.translateY( 40/2 );
+			cajaFig2_2.rotation.z = 0.785398;
+			var cilindroFig3 = new THREE.Mesh(cylinderGeometryFig3,materialG);
+			var cilindroFig3_2 = new THREE.Mesh(cylinderGeometryFig3_2,materialR);
+			var cilindroFig3_3 = new THREE.Mesh(cylinderGeometryFig3_3,materialB);
+			var cilindroFig3_4 = new THREE.Mesh(cylinderGeometryFig3_4,materialY);
+			var cilindroFig4 = new THREE.Mesh(cylinderGeometryFig4,materialG);
+			var cilindroFig4_2 = new THREE.Mesh(cylinderGeometryFig4_2,materialR);
+			var cilindroFig4_3 = new THREE.Mesh(cylinderGeometryFig4_3,materialY);
+			cilindroFig4_2.translateY( (40/2)+5 );
+			var cilindroFig5 = new THREE.Mesh(cylinderGeometryFig5,materialG);
+			var cajaFig5 = new THREE.Mesh(boxGeometryFig5,materialR);
+			cilindroFig5.translateY(40/2+5);
+		//CONVERTIR A CSG
+			var boxFig1CSG = THREE.CSG.fromMesh( cajaFig1 );
+			var cylinderFig1CSG = THREE.CSG.fromMesh( cilindroFig1 );
+			var cylinderFig1_2CSG = THREE.CSG.fromMesh( cilindroFig1_2 );
+			var cylinderFig1_3CSG = THREE.CSG.fromMesh( cilindroFig1_3 );
+			var cylinderFig1_4CSG = THREE.CSG.fromMesh( cilindroFig1_4 );
+			var boxFig2CSG = THREE.CSG.fromMesh( cajaFig2 );
+			var boxFig2_2CSG = THREE.CSG.fromMesh( cajaFig2_2 );
+			var cylinderFig2CSG = THREE.CSG.fromMesh( cilindroFig2 );
+			var cylinderFig2_2CSG = THREE.CSG.fromMesh( cilindroFig2_2 );
+			var cylinderFig3CSG = THREE.CSG.fromMesh( cilindroFig3 );
+			var cylinderFig3_2CSG = THREE.CSG.fromMesh( cilindroFig3_2 );
+			var cylinderFig3_3CSG = THREE.CSG.fromMesh( cilindroFig3_3 );
+			var cylinderFig3_4CSG = THREE.CSG.fromMesh( cilindroFig3_4 );
+			var cylinderFig4CSG = THREE.CSG.fromMesh( cilindroFig4 );
+			var cylinderFig4_2CSG = THREE.CSG.fromMesh( cilindroFig4_2 );
+			var cylinderFig4_3CSG = THREE.CSG.fromMesh( cilindroFig4_3 );
+			var cylinderFig5CSG = THREE.CSG.fromMesh( cilindroFig5 );
+			var boxFig5CSG = THREE.CSG.fromMesh(cajaFig5);
+		//APLICAR LAS OPERACIONES
+			var Fig1 = boxFig1CSG.union(cylinderFig1CSG.union(cylinderFig1_2CSG.union(cylinderFig1_3CSG.union(cylinderFig1_4CSG))));
+			var Fig2 = cylinderFig2CSG.union(cylinderFig2_2CSG.union(boxFig2CSG.subtract(boxFig2_2CSG)));
+			var Fig3 = cylinderFig3CSG.subtract(cylinderFig3_4CSG);
+			var Fig3_2 = cylinderFig3_2CSG.subtract(cylinderFig3_4CSG);
+			var Fig3_3 = cylinderFig3_3CSG.subtract(cylinderFig3_4CSG);
+			var Fig4 = cylinderFig4CSG.subtract(cylinderFig4_3CSG);
+			var Fig5 = boxFig5CSG.union(cylinderFig5CSG);
+		//CONVERTIR A THREE
+			var Ficha_1 = THREE.CSG.toMesh( Fig1 );
+			var Ficha_2 = THREE.CSG.toMesh( Fig2 );
+			var Ficha_3_1 = THREE.CSG.toMesh( Fig3 );
+			var Ficha_3_2 = THREE.CSG.toMesh( Fig3_2 );
+			var Ficha_3_3 = THREE.CSG.toMesh( Fig3_3 );
+			Ficha_3_2.translateY( (30/2)+5 );
+			Ficha_3_3.translateY( (-30/2)-5 );
+			var Ficha_4_1 = THREE.CSG.toMesh( Fig4 );
+			var Ficha_5 = THREE.CSG.toMesh(Fig5);
+		// CONVERTIR A CSG LAS FIGURAS GENERADAS CON LAS OPERACIONES
+			var Ficha_3CSG = THREE.CSG.fromMesh( Ficha_3_1 );
+			var Ficha_3_2CSG = THREE.CSG.fromMesh( Ficha_3_2 );
+			var Ficha_3_3CSG = THREE.CSG.fromMesh( Ficha_3_3 );
+			var Ficha_4CSG = THREE.CSG.fromMesh( Ficha_4_1 );
+		//OPERACION FINAL
+			var resultado = Ficha_3CSG.union(Ficha_3_2CSG.union(Ficha_3_3CSG));
+			var Ficha_3 = THREE.CSG.toMesh( resultado );
+			var resultado = Ficha_4CSG.union(cylinderFig4_2CSG);
+			var Ficha_4 = THREE.CSG.toMesh( resultado );
 		init();
 		animate();
 		function init(){
@@ -55,19 +171,11 @@
 		  	var colorB = new THREE.Color( 0x333366 );
 			
 			// roll-over helpers
-			
-			var rollOverGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
-				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-				scene.add( rollOverMesh );
-				
-			// CUBOS
-
-			cubeGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
-			cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c} );
-				
+			rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+			Ficha_1.material = rollOverMaterial;
+			rollOverMesh = Ficha_1;
+			scene.add( rollOverMesh );
 			// GRILLAS
-
 			var gridHelper = new THREE.GridHelper( 1000, 20 );
 			scene.add( gridHelper );
             
@@ -75,7 +183,7 @@
 			var axesHelper = new THREE.AxesHelper( size );
 			scene.add( axesHelper );
 			//
-			
+		
 			raycaster = new THREE.Raycaster();
 			mouse = new THREE.Vector2();
 
@@ -83,7 +191,7 @@
 			geometry.rotateX( - Math.PI / 2 );
 
 			plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
-			scene.add( plane );
+			//scene.add( plane );
 
 			objects.push( plane );
 			
@@ -104,98 +212,201 @@
 		}
 		
 		function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 			}
 
 			function onDocumentMouseMove( event ) {
-
-				event.preventDefault();
-
+				event.preventDefault()
 				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-
 				raycaster.setFromCamera( mouse, camera );
-
 				var intersects = raycaster.intersectObjects( objects );
-
 				if ( intersects.length > 0 ) {
-
 					var intersect = intersects[ 0 ];
-
 					rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
 					rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-
 				}
-
 				render();
-
 			}
 
 			function onDocumentMouseDown( event ) {
-
 				event.preventDefault();
-
 				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-
 				raycaster.setFromCamera( mouse, camera );
-
 				var intersects = raycaster.intersectObjects( objects );
-
 				if ( intersects.length > 0 ) {
-
 					var intersect = intersects[ 0 ];
-
 					// delete cube
-
 					if ( isShiftDown ) {
-
 						if ( intersect.object !== plane ) {
-
 							scene.remove( intersect.object );
-
 							objects.splice( objects.indexOf( intersect.object ), 1 );
-
 						}
-
 						// create cube
-
 					} else {
-
-						var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+					if(uno){
+						var voxel = new THREE.Mesh( Ficha_1.geometry, materialR);
 						voxel.position.copy( intersect.point ).add( intersect.face.normal );
 						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
 						scene.add( voxel );
-
 						objects.push( voxel );
-
 					}
-
+					if(dos){
+						var voxel = new THREE.Mesh( Ficha_2.geometry, materialB);
+						voxel.position.copy( intersect.point ).add( intersect.face.normal );
+						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+						scene.add( voxel );
+						objects.push( voxel );
+					}
+					if(tres){
+						scene.add( rollOverMesh );
+						var voxel = new THREE.Mesh( Ficha_3.geometry, materialG);
+						voxel.position.copy( intersect.point ).add( intersect.face.normal );
+						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+						scene.add( voxel );
+						objects.push( voxel );
+					}
+					if(cuatro){
+						scene.add( rollOverMesh );
+						var voxel = new THREE.Mesh( Ficha_4.geometry, materialY);
+						voxel.position.copy( intersect.point ).add( intersect.face.normal );
+						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+						scene.add( voxel );
+						objects.push( voxel );
+					}
+					if(cinco){
+						scene.add( rollOverMesh );
+						var voxel = new THREE.Mesh( Ficha_5.geometry, materialS);
+						voxel.position.copy( intersect.point ).add( intersect.face.normal );
+						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+						scene.add( voxel );
+						objects.push( voxel );
+					}
+					}
 					render();
-
 				}
-
 			}
 
 			function onDocumentKeyDown( event ) {
-
 				switch ( event.keyCode ) {
-
 					case 16: isShiftDown = true; break;
-
+					case 49:
+					uno = true;
+					scene.remove( rollOverMesh );
+					Ficha_1.material = rollOverMaterial;
+					rollOverMesh = Ficha_1;
+					scene.add( rollOverMesh );
+					dos = false;
+					tres = false;
+					cuatro = false;
+					cinco = false;
+					break;
+					case 97:
+					uno = true;
+					scene.remove( rollOverMesh );
+					Ficha_1.material = rollOverMaterial;
+					rollOverMesh = Ficha_1;
+					scene.add( rollOverMesh );
+					dos = false;
+					tres = false;
+					cuatro = false;
+					cinco = false;
+					break;
+					case 50:
+					uno = false;
+					dos = true;
+					scene.remove( rollOverMesh );
+					Ficha_2.material = rollOverMaterial;
+					rollOverMesh = Ficha_2;
+					scene.add( rollOverMesh );
+					tres = false;
+					cuatro = false;
+					cinco = false;
+					case 98:
+					uno = false;
+					dos = true;
+					scene.remove( rollOverMesh );
+					Ficha_2.material = rollOverMaterial;
+					rollOverMesh = Ficha_2;
+					scene.add( rollOverMesh );
+					tres = false;
+					cuatro = false;
+					cinco = false;
+					break;
+					case 51:
+					uno = false;
+					dos = false;
+					tres = true;
+					scene.remove( rollOverMesh );
+					Ficha_3.material = rollOverMaterial;
+					rollOverMesh = Ficha_3;
+					scene.add( rollOverMesh );
+					cuatro = false;
+					cinco = false;
+					break;
+					case 99:
+					uno = false;
+					dos = false;
+					tres = true;
+					scene.remove( rollOverMesh );
+					Ficha_3.material = rollOverMaterial;
+					rollOverMesh = Ficha_3;
+					scene.add( rollOverMesh );
+					cuatro = false;
+					cinco = false;
+					break;
+					case 52:
+					uno = false;
+					dos = false;
+					tres = false;
+					cuatro = true;
+					scene.remove( rollOverMesh );
+					Ficha_4.material = rollOverMaterial;
+					rollOverMesh = Ficha_4;
+					scene.add( rollOverMesh );
+					cinco = false;
+					break;
+					case 100:
+					uno = false;
+					dos = false;
+					tres = false;
+					cuatro = true;
+					scene.remove( rollOverMesh );
+					Ficha_4.material = rollOverMaterial;
+					rollOverMesh = Ficha_4;
+					scene.add( rollOverMesh );
+					cinco = false;
+					break;
+					case 53:
+					uno = false;
+					dos = false;
+					tres = false;
+					cuatro = false;
+					cinco = true;
+					scene.remove( rollOverMesh );
+					Ficha_5.material = rollOverMaterial;
+					rollOverMesh = Ficha_5;
+					scene.add( rollOverMesh );
+					break;
+					case 101:
+					uno = false;
+					dos = false;
+					tres = false;
+					cuatro = false;
+					cinco = true;
+					scene.remove( rollOverMesh );
+					Ficha_5.material = rollOverMaterial;
+					rollOverMesh = Ficha_5;
+					scene.add( rollOverMesh );
+					break;
 				}
 
 			}
 
 		function onDocumentKeyUp( event ) {
-
 				switch ( event.keyCode ) {
-
 					case 16: isShiftDown = false; break;
-
 				}
 
 			}
@@ -206,9 +417,7 @@
 			render();
 		}
 		function render() {
-
 			renderer.render( scene, camera );
-
 		}
 
 		
