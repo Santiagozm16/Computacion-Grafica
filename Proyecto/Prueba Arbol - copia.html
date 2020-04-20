@@ -62,14 +62,9 @@
 			nodos[aux+t].position.z = Math.random() * (2 - (-2)) + (-2);
 			}
 			//JERARQUIA PARA LAS ESFERAS DEL ARBOL
-			nodos[0].add(nodos[8]);
-			nodos[0].add(nodos[7]);
-			nodos[0].add(nodos[6]);
-			nodos[0].add(nodos[5]);
-			nodos[0].add(nodos[4]);
-			nodos[0].add(nodos[3]);
-			nodos[0].add(nodos[2]);
-			nodos[0].add(nodos[1]);
+			for ( var t = 1; t<nodos.length; t++){
+			nodos[0].add(nodos[t])
+			}
 			// CREACIOÓN DE LA LINEA
 			var material2 = new THREE.LineBasicMaterial( { color: 0x0000ff });
 			var points = [];
@@ -80,8 +75,6 @@
 			var geometry2 = new THREE.BufferGeometry().setFromPoints( points );
 			var line = new THREE.Line( geometry2, material2 );
 			nodos[0].add( line ); //RELACIONAR LA LINEA CON LAS ESFERAS (PADRE E HIJO)
-			//nodos[0].position.y = 3;
-			//scene.add(nodos[0]);
 			return nodos;
 			}
 		}
