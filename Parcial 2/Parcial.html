@@ -161,8 +161,8 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
-			controls.mouseButtons = {
-			}
+			//controls.mouseButtons = {
+			//}
 			//ELEMENTOS COMUNES
 			var size = 500;
 			var origin = new THREE.Vector3( 0, 0, 0 );
@@ -264,7 +264,6 @@
 						objects.push( voxel );
 					}
 					if(tres){
-						scene.add( rollOverMesh );
 						var voxel = new THREE.Mesh( Ficha_3.geometry, materialG);
 						voxel.position.copy( intersect.point ).add( intersect.face.normal );
 						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
@@ -272,7 +271,6 @@
 						objects.push( voxel );
 					}
 					if(cuatro){
-						scene.add( rollOverMesh );
 						var voxel = new THREE.Mesh( Ficha_4.geometry, materialY);
 						voxel.position.copy( intersect.point ).add( intersect.face.normal );
 						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
@@ -280,7 +278,6 @@
 						objects.push( voxel );
 					}
 					if(cinco){
-						scene.add( rollOverMesh );
 						var voxel = new THREE.Mesh( Ficha_5.geometry, materialS);
 						voxel.position.copy( intersect.point ).add( intersect.face.normal );
 						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
