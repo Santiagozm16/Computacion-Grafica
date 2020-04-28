@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dark</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body onload= "crearArbol()">
+    <script src="js/three.js"></script>
+	<script src="js/controls/TrackballControls.js"></script>
+	 <script src="js/threex.domevents.js"></script>
+	
+    <script>
+	
+		var scene, aspect, camera, renderer, controls;
+		var arbolFamilia1;
+		var arbolFamilia2;
+		var arbolFamilia3;
+		var arbolFamilia4;
+		//var material;
+		//var nodo;
+		//var bolita;
+		//var nodo = new THREE.SphereGeometry( 0.5, 32, 32 ); //GEOMETRYA PARA LAS ESFERAS
+		//var nodos = new Array(); //ARRAY DONDE SE GUARDA CADA UNA DE LAS ESFERAS 
+		
+		class Arboles{
+		  constructor( NumG, arregloF, matLinea){
+		    this.NumG = NumG;
+			this.arregloF = arregloF;
+            this.matLinea = matLinea;
+		  }
+		  Dibujar_arbol(){
+			var nodo = new THREE.SphereGeometry( 0.5, 32, 32 ); //GEOMETRYA PARA LAS ESFERAS
+			var nodos = new Array(); //ARRAY DONDE SE GUARDA CADA UNA DE LAS ESFERAS//CREACION DE ESFERAS TOTALES
+			for (var i = 0; i<= this.NumG; i++){
+				for(var j = 0; j< this.arregloF[i];j++){
+				var material = new THREE.MeshBasicMaterial( {  color: Math.random() * 0xe0e0e0, opacity: 0.8 } );
+				var bolita = new THREE.Mesh( nodo, material );
+				nodos.push(bolita);
+				}
+			}
+			var aux = 0; 
+			for(var a = 0; a<this.arregloF[0]+1;a++){ //UBICAR ESFERAS GENERACION 1
+				if(a<this.arregloF[0]){
+				nodos[a].position.x= 6*a
+			    aux = aux + 1;}
+			}
+			//console.log(aux + " aux");
+			for(var m = 0; m < this.arregloF[1] ; m++){ //UBICAR ESFERAS GENERACION 2
+				nodos[aux].position.y = -5;
+				//nodos[aux].position.z= -1;
+				if(this.arregloF[1]<=1 && this.arregloF[0]>1 ){
+					nodos[aux].position.x=((nodos[aux-1].position.x-nodos[aux-aux].position.x)/2)+nodos[aux-aux].position.x;
+				}
+				else nodos[aux].position.x = 6*m;
+				nodos[aux].position.z= 1;
+				aux = aux +1;
+			}
+			//console.log(aux);
+			for(var t = 0; t<this.arregloF[2];t++){ //UBICAR ESFERAS GENERACION 3
+				nodos[aux+t].position.y = -10;
+				if(this.arregloF[1] >= 1 && this.arregloF[0] > 1 ){
+					nodos[aux].position.x= 3*m;//((nodos[aux-1].position.x-nodos[aux-aux].position.x))+nodos[aux-aux].position.x;
+					console.log(aux);
+				} else if (this.arregloF[1] > 1 && this.arregloF[0] >= 1 ){
+					nodos[aux].position.x= 4;
+				} if(this.arregloF[2] > 2){
+					console.log('entro');
+					console.log('var' + aux);
+					nodos[aux+1].position.x = 9.8;	
+				}
+				nodos[aux+t].position.x = 8*t;
+				//nodos[aux+t].position.z = 2;
+				
+			}
+				aux = aux + this.arregloF[2];
+			//console.log(aux);
+			for(var t = 0; t<this.arregloF[3];t++){ //UBICAR ESFERAS GENERACION 4
+			nodos[aux+t].position.y = -15;
+				if(this.arregloF[3]<=1 && this.arregloF[2]>1){
+					nodos[aux].position.x=((nodos[aux-1].position.x-nodos[aux-this.arregloF[2]].position.x)/2)+nodos[aux-this.arregloF[2]].position.x;
+				} else if(this.arregloF[3]>1 && this.arregloF[3]<= 2 ){
+					nodos[aux].position.x = 3*m;
+					nodos[aux+t].position.x = 8*t;
+				}
+				else if(this.arregloF[3] > 2) {
+					nodos[aux].position.x = 7;
+					nodos[aux+1].position.x = 12.5;
+					nodos[aux+2].position.x = 9*t;
+					}
+				
+			}
+			//JERARQUIA PARA LAS ESFERAS DEL ARBOL
+			for ( var t = 1; t<nodos.length; t++){
+				nodos[0].add(nodos[t])
+			}
+			
+			// CREACIOÓN DE LA LINEA
+			var points = [];
+					aux=0;
+					for(var i = 0; i<this.arregloF[0];i++){ //LINEA G 1 ><
+						var vector = new THREE.Vector3( nodos[aux].position.x, nodos[aux].position.y, nodos[aux].position.z );
+						points.push(vector);
+						aux++;
+					}
+					
+					for(var i = 0; i<this.arregloF[1];i++){ //LINEA G 2 ><
+						if(this.arregloF[0]>=1){
+							var vector =new THREE.Vector3( (nodos[aux-1].position.x-nodos[aux-this.arregloF[0]].position.x)/2 + nodos[aux-this.arregloF[0]].position.x, nodos[aux-1].position.y, nodos[aux-1].position.z );
+							points.push(vector);
+						}
+						vector = new THREE.Vector3( nodos[aux].position.x, nodos[aux].position.y, nodos[aux].position.z );
+						points.push(vector);
+						aux++;
+					}
+					
+					for(var i = 0; i<this.arregloF[2];i++){
+						if(this.arregloF[1]>=1 ){
+							var vector =new THREE.Vector3( (nodos[aux-1].position.x-nodos[aux-this.arregloF[1]].position.x)/2 + nodos[aux-this.arregloF[1]].position.x, nodos[aux-1].position.y, nodos[aux-1].position.z );
+							points.push(vector);
+						}
+
+						vector = new THREE.Vector3( nodos[aux].position.x, nodos[aux].position.y, nodos[aux].position.z );
+						points.push(vector);
+						aux++;
+					}
+					for(var i = 1; i<this.arregloF[3]+1;i++){
+						var vector;
+						if(this.arregloF[2]>=1 && this.arregloF[2] < 3){
+							vector =new THREE.Vector3( (nodos[aux-1].position.x-nodos[aux-this.arregloF[2]].position.x)/2 + nodos[aux-this.arregloF[2]].position.x, nodos[aux-1].position.y, nodos[aux-1].position.z );
+							points.push(vector);
+						} else {
+							vector =new THREE.Vector3( (nodos[aux-1].position.x-nodos[aux-this.arregloF[2]].position.x)/2 + 3 + nodos[aux-this.arregloF[2]].position.x, nodos[aux-1].position.y, nodos[aux-1].position.z );
+							points.push(vector);
+						}
+						if(this.arregloF[3]>=2){
+						     vector =new THREE.Vector3( (nodos[aux+this.arregloF[3]-i].position.x-nodos[aux].position.x)/2 + nodos[aux].position.x, nodos[aux].position.y, nodos[aux].position.z );
+							 points.push(vector);
+						}
+							vector = new THREE.Vector3( nodos[aux].position.x, nodos[aux].position.y, nodos[aux].position.z );
+							points.push(vector);
+						aux++;
+					
+					}
+					
+					
+					var geometry2 = new THREE.BufferGeometry().setFromPoints( points );
+					var line = new THREE.Line( geometry2, this.matLinea );
+					nodos[0].add( line ); //RELACIONAR LA LINEA CON LAS ESFERAS (PADRE E HIJO)
+					//console.log(nodos.length);
+					return nodos;
+			}
+		}
+		init();
+		animate();
+		function init(){
+			//INICIALIZACIÓN
+	        scene = new THREE.Scene();
+			/*const loader = new THREE.TextureLoader();
+			loader.load('Fondo.jpg', function(texture)
+			{
+				scene.background = texture;
+			});*/
+			scene.background = new THREE.Color( 0xFFFFFF );
+	        aspect = window.innerWidth / window.innerHeight;
+	        camera = new THREE.PerspectiveCamera( 75, aspect, 0.1, 1000);
+	        renderer = new THREE.WebGLRenderer({antialias: true});
+	        renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			
+			controls = new THREE.TrackballControls(camera);
+
+			controls.rotateSpeed = 0.2;
+			controls.zoomSpeed = 4.0;
+
+			controls.noZoom = false;
+			controls.noPan = false;
+
+			controls.staticMoving = false;
+			controls.dynamicDampingFactor = 0.3;
+			controls.addEventListener('change', render);
+
+			var text, text1, text2, text3;
+
+			  var loader = new THREE.FontLoader();
+
+				loader.load( 'Bahnschrift_Regular.typeface.json', function ( font ) {
+
+					var geometry = new THREE.TextBufferGeometry( 'Doppler', {
+						font: font,
+						size: 1.5,
+						height: 0.1,
+						curveSegments: 12,
+					} );
+					var matLite = new THREE.MeshBasicMaterial( {
+						color: 0x00D8CB,
+						transparent: true,
+						opacity: 1,
+						side: THREE.DoubleSide
+					} );
+
+					text = new THREE.Mesh( geometry, matLite );
+					text.position.x = -18;
+					text.position.y = 10;
+					scene.add( text);
+					console.log(text);
+
+				} );
+
+
+				loader.load( 'Bahnschrift_Regular.typeface.json', function ( font ) {
+
+				var geometry = new THREE.TextBufferGeometry( 'Tiedemann', {
+					font: font,
+					size: 1.5,
+					height: 0.1,
+					curveSegments: 12,
+				} );
+				var matLite = new THREE.MeshBasicMaterial( {
+					color: 0xFF6441,
+					transparent: true,
+					opacity: 1,
+					side: THREE.DoubleSide
+				} );
+
+				text1 = new THREE.Mesh( geometry, matLite );
+				text1.position.x = -42;
+				text1.position.y = 10;
+				scene.add( text1);
+
+
+				} );
+
+				loader.load( 'Bahnschrift_Regular.typeface.json', function ( font ) {
+
+					var geometry = new THREE.TextBufferGeometry( 'Kahnwald', {
+						font: font,
+						size: 1.5,
+						height: 0.1,
+						curveSegments: 12,
+					} );
+					var matLite = new THREE.MeshBasicMaterial( {
+						color: 0xF1F100,
+						transparent: true,
+						opacity: 1,
+						side: THREE.DoubleSide
+					} );
+
+					text2 = new THREE.Mesh( geometry, matLite );
+					text2.position.x = 2;
+					text2.position.y = 10;
+					scene.add( text2);
+
+
+					} );
+
+					loader.load( 'Bahnschrift_Regular.typeface.json', function ( font ) {
+
+					var geometry = new THREE.TextBufferGeometry( 'Nielsen', {
+						font: font,
+						size: 1.5,
+						height: 0.1,
+						curveSegments: 12,
+					} );
+					var matLite = new THREE.MeshBasicMaterial( {
+						color: 0xFF7DB6,
+						transparent: true,
+						opacity: 1,
+						side: THREE.DoubleSide
+					} );
+
+					text3 = new THREE.Mesh( geometry, matLite );
+					text3.position.x = 31;
+					text3.position.y = 10;
+					scene.add( text3);
+
+
+					} );
+
+			
+
+			camera.position.x = 0;
+			camera.position.y = 0;
+		  	camera.position.z = 40;
+			camera.lookAt( origin );	
+		}
+		
+		function crearArbol(){
+			var matLineaF1 = new THREE.LineBasicMaterial( { color: 0xFF6441 });
+              var matLineaF2 = new THREE.LineBasicMaterial( { color: 0x00D8CB });
+              var matLineaF3 = new THREE.LineBasicMaterial( { color: 0xF1F100 });
+              var matLineaF4 = new THREE.LineBasicMaterial( { color: 0xFF7DB6 });
+
+			var Familia1 = [2,1,2,1]; //ARREGLO DONDE SE PONE LA CANTIDAD DE MIEMBROS POR CADA GENERACIÓN
+			var Familia2 = [2,1,2,2]; //ARREGLO DONDE SE PONE LA CANTIDAD DE MIEMBROS POR CADA GENERACIÓN
+			var Familia3 = [1,1,2,1]; //ARREGLO DONDE SE PONE LA CANTIDAD DE MIEMBROS POR CADA GENERACIÓN
+			var Familia4 = [1,2,3,3]; //ARREGLO DONDE SE PONE LA CANTIDAD DE MIEMBROS POR CADA GENERACIÓN
+			
+			var Arbol_1 = new Arboles(4,Familia1,matLineaF1);
+			var Arbol_2 = new Arboles(4,Familia2,matLineaF2);
+			var Arbol_3 = new Arboles(4,Familia3,matLineaF3);
+			var Arbol_4 = new Arboles(4,Familia4,matLineaF4);
+			arbolFamilia1 = Arbol_1.Dibujar_arbol();
+			arbolFamilia2 = Arbol_2.Dibujar_arbol();
+			arbolFamilia3 = Arbol_3.Dibujar_arbol();
+			arbolFamilia4 = Arbol_4.Dibujar_arbol();
+			scene.add(arbolFamilia1[0]);
+			arbolFamilia1[0].position.x=-40;
+			arbolFamilia1[0].position.y=7;
+			arbolFamilia2[0].position.x=-18;
+			arbolFamilia2[0].position.y=7;
+			scene.add(arbolFamilia2[0]);
+			arbolFamilia3[0].position.x=5;
+			arbolFamilia3[0].position.y=7;
+			scene.add(arbolFamilia3[0]);
+			arbolFamilia4[0].position.x=28;
+			arbolFamilia4[0].position.y=7;
+			scene.add(arbolFamilia4[0]);
+			
+			interactividadFamilia1();
+			interactividadFamilia2();
+			interactividadFamilia3();
+			interactividadFamilia4();
+
+		}
+		function interactividadFamilia1(){
+			var materialSelec = new THREE.LineBasicMaterial( { color: 0xF10000 });
+			var materialOriginal;
+			var domEvents=new THREEx.DomEvents(camera,render.domElement);
+			domEvents.addEventListener(arbolFamilia1[0],'mouseover', event=>{
+				arbolFamilia1[0].scale.set(2,2,2);
+			});
+			domEvents.addEventListener(arbolFamilia1[0],'mouseout', event=>{
+				arbolFamilia1[0].scale.set(1,1,1);
+			});
+			domEvents.addEventListener(arbolFamilia1[1],'mouseover', event=>{
+				materialOriginal = arbolFamilia1[1].material;
+				arbolFamilia1[1].scale.set(2,2,2);
+				arbolFamilia1[1].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia1[1],'mouseout', event=>{
+				arbolFamilia1[1].scale.set(1,1,1);
+				arbolFamilia1[1].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia1[2],'mouseover', event=>{
+				materialOriginal = arbolFamilia1[2].material;
+				arbolFamilia1[2].scale.set(2,2,2);
+				arbolFamilia1[2].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia1[2],'mouseout', event=>{
+				arbolFamilia1[2].scale.set(1,1,1);
+				arbolFamilia1[2].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia1[3],'mouseover', event=>{
+				materialOriginal = arbolFamilia1[3].material;
+				arbolFamilia1[3].scale.set(2,2,2);
+				arbolFamilia1[3].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia1[3],'mouseout', event=>{
+				arbolFamilia1[3].scale.set(1,1,1);
+				arbolFamilia1[3].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia1[4],'mouseover', event=>{
+				materialOriginal = arbolFamilia1[4].material;
+				arbolFamilia1[4].scale.set(2,2,2);
+				arbolFamilia1[4].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia1[4],'mouseout', event=>{
+				arbolFamilia1[4].scale.set(1,1,1);
+				arbolFamilia1[4].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia1[5],'mouseover', event=>{
+				materialOriginal = arbolFamilia1[5].material;
+				arbolFamilia1[5].scale.set(2,2,2);
+				arbolFamilia1[5].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia1[5],'mouseout', event=>{
+				arbolFamilia1[5].scale.set(1,1,1);
+				arbolFamilia1[5].material = materialOriginal;
+			});
+		}
+		function interactividadFamilia2(){
+			var materialSelec = new THREE.LineBasicMaterial( { color: 0xF10000 });
+			var materialOriginal;
+			var domEvents=new THREEx.DomEvents(camera,render.domElement);
+			domEvents.addEventListener(arbolFamilia2[0],'mouseover', event=>{
+				arbolFamilia2[0].scale.set(2,2,2);
+			});
+			domEvents.addEventListener(arbolFamilia2[0],'mouseout', event=>{
+				arbolFamilia2[0].scale.set(1,1,1);
+			});
+			domEvents.addEventListener(arbolFamilia2[1],'mouseover', event=>{
+				materialOriginal = arbolFamilia2[1].material;
+				arbolFamilia2[1].scale.set(2,2,2);
+				arbolFamilia2[1].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia2[1],'mouseout', event=>{
+				arbolFamilia2[1].scale.set(1,1,1);
+				arbolFamilia2[1].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia2[2],'mouseover', event=>{
+				materialOriginal = arbolFamilia2[2].material;
+				arbolFamilia2[2].scale.set(2,2,2);
+				arbolFamilia2[2].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia2[2],'mouseout', event=>{
+				arbolFamilia2[2].scale.set(1,1,1);
+				arbolFamilia2[2].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia2[3],'mouseover', event=>{
+				materialOriginal = arbolFamilia2[3].material;
+				arbolFamilia2[3].scale.set(2,2,2);
+				arbolFamilia2[3].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia2[3],'mouseout', event=>{
+				arbolFamilia2[3].scale.set(1,1,1);
+				arbolFamilia2[3].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia2[4],'mouseover', event=>{
+				materialOriginal = arbolFamilia2[4].material;
+				arbolFamilia2[4].scale.set(2,2,2);
+				arbolFamilia2[4].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia2[4],'mouseout', event=>{
+				arbolFamilia2[4].scale.set(1,1,1);
+				arbolFamilia2[4].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia2[5],'mouseover', event=>{
+				materialOriginal = arbolFamilia2[5].material;
+				arbolFamilia2[5].scale.set(2,2,2);
+				arbolFamilia2[5].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia2[5],'mouseout', event=>{
+				arbolFamilia2[5].scale.set(1,1,1);
+				arbolFamilia2[5].material = materialOriginal;
+			});
+						domEvents.addEventListener(arbolFamilia2[6],'mouseover', event=>{
+				materialOriginal = arbolFamilia2[6].material;
+				arbolFamilia2[6].scale.set(2,2,2);
+				arbolFamilia2[6].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia2[6],'mouseout', event=>{
+				arbolFamilia2[6].scale.set(1,1,1);
+				arbolFamilia2[6].material = materialOriginal;
+			});
+		}
+		
+		function interactividadFamilia3(){
+			var materialSelec = new THREE.LineBasicMaterial( { color: 0xF10000 });
+			var domEvents=new THREEx.DomEvents(camera,render.domElement);
+			domEvents.addEventListener(arbolFamilia3[0],'mouseover', event=>{
+				arbolFamilia3[0].scale.set(2,2,2);
+			});
+			domEvents.addEventListener(arbolFamilia3[0],'mouseout', event=>{
+				arbolFamilia3[0].scale.set(1,1,1);
+			});
+			domEvents.addEventListener(arbolFamilia3[1],'mouseover', event=>{
+				materialOriginal = arbolFamilia3[1].material;
+				arbolFamilia3[1].scale.set(2,2,2);
+				arbolFamilia3[1].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia3[1],'mouseout', event=>{
+				arbolFamilia3[1].scale.set(1,1,1);
+				arbolFamilia3[1].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia3[2],'mouseover', event=>{
+				materialOriginal = arbolFamilia3[2].material;
+				arbolFamilia3[2].scale.set(2,2,2);
+				arbolFamilia3[2].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia3[2],'mouseout', event=>{
+				arbolFamilia3[2].scale.set(1,1,1);
+				arbolFamilia3[2].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia3[3],'mouseover', event=>{
+				materialOriginal = arbolFamilia3[3].material;
+				arbolFamilia3[3].scale.set(2,2,2);
+				arbolFamilia3[3].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia3[3],'mouseout', event=>{
+				arbolFamilia3[3].scale.set(1,1,1);
+				arbolFamilia3[3].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia3[4],'mouseover', event=>{
+				materialOriginal = arbolFamilia2[4].material;
+				arbolFamilia3[4].scale.set(2,2,2);
+				arbolFamilia3[4].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia3[4],'mouseout', event=>{
+				arbolFamilia3[4].scale.set(1,1,1);
+				arbolFamilia3[4].material = materialOriginal;
+			    
+			});
+			
+		}
+		function interactividadFamilia4(){
+			var materialSelec = new THREE.LineBasicMaterial( { color: 0xF10000 });
+			var domEvents=new THREEx.DomEvents(camera,render.domElement);
+			domEvents.addEventListener(arbolFamilia4[0],'mouseover', event=>{
+				arbolFamilia4[0].scale.set(2,2,2);
+			});
+			domEvents.addEventListener(arbolFamilia4[0],'mouseout', event=>{
+				arbolFamilia4[0].scale.set(1,1,1);
+			});
+			domEvents.addEventListener(arbolFamilia4[1],'mouseover', event=>{
+				materialOriginal = arbolFamilia4[1].material;
+				arbolFamilia4[1].scale.set(2,2,2);
+				arbolFamilia4[1].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia4[1],'mouseout', event=>{
+				arbolFamilia4[1].scale.set(1,1,1);
+				arbolFamilia4[1].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia4[2],'mouseover', event=>{
+				materialOriginal = arbolFamilia4[2].material;
+				arbolFamilia4[2].scale.set(2,2,2);
+				arbolFamilia4[2].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia4[2],'mouseout', event=>{
+				arbolFamilia4[2].scale.set(1,1,1);
+				arbolFamilia4[2].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia4[3],'mouseover', event=>{
+				materialOriginal = arbolFamilia4[3].material;
+				arbolFamilia4[3].scale.set(2,2,2);
+				arbolFamilia4[3].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia4[3],'mouseout', event=>{
+				arbolFamilia4[3].scale.set(1,1,1);
+				arbolFamilia4[3].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia4[4],'mouseover', event=>{
+				materialOriginal = arbolFamilia4[4].material;
+				arbolFamilia4[4].scale.set(2,2,2);
+				arbolFamilia4[4].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia4[4],'mouseout', event=>{
+				arbolFamilia4[4].scale.set(1,1,1);
+				arbolFamilia4[4].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia4[5],'mouseover', event=>{
+				materialOriginal = arbolFamilia4[5].material;
+				arbolFamilia4[5].scale.set(2,2,2);
+				arbolFamilia4[5].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia4[5],'mouseout', event=>{
+				arbolFamilia4[5].scale.set(1,1,1);
+				arbolFamilia4[5].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia4[6],'mouseover', event=>{
+				materialOriginal = arbolFamilia4[6].material;
+				arbolFamilia4[6].scale.set(2,2,2);
+				arbolFamilia4[6].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia4[6],'mouseout', event=>{
+				arbolFamilia4[6].scale.set(1,1,1);
+				arbolFamilia4[6].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia4[7],'mouseover', event=>{
+				materialOriginal = arbolFamilia4[7].material;
+				arbolFamilia4[7].scale.set(2,2,2);
+				arbolFamilia4[7].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia4[7],'mouseout', event=>{
+				arbolFamilia4[7].scale.set(1,1,1);
+				arbolFamilia4[7].material = materialOriginal;
+			});
+			domEvents.addEventListener(arbolFamilia4[8],'mouseover', event=>{
+				materialOriginal = arbolFamilia4[8].material;
+				arbolFamilia4[8].scale.set(2,2,2);
+				arbolFamilia4[8].material = materialSelec;
+			});
+			domEvents.addEventListener(arbolFamilia4[8],'mouseout', event=>{
+				arbolFamilia4[8].scale.set(1,1,1);
+				arbolFamilia4[8].material = materialOriginal;
+			});
+		}
+		
+		
+		function animate(){
+			requestAnimationFrame( animate );
+			controls.update();
+			render();
+		}
+		function render(){
+
+			renderer.render( scene, camera );
+		}
+    </script>
+  </body>
+</html>
