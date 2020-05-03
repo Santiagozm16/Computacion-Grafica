@@ -31,7 +31,10 @@
 			aspect = window.innerWidth / window.innerHeight;
 			camera = new THREE.PerspectiveCamera( alpha, aspect, 0.1, 100);
 			camera2 = new THREE.PerspectiveCamera( alpha, 1.33, 0.1, 50);
+			camera3 = new THREE.PerspectiveCamera( alpha, 1.33, 0.1, 50);
             var helper = new THREE.CameraHelper( camera );
+            var helper1 = new THREE.CameraHelper( camera3 );
+			//scene.add( helper1 );
             scene.add( helper );
 			renderer = new THREE.WebGLRenderer({antialias: true});
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -107,8 +110,8 @@
 			//mesh.add(helper);
 			sphere.translateX(-8);
 			sphere.translateZ(-15);
-			cube.translateZ(-12.5);
-			cube.translateX(8);
+			cube.translateZ(-13);
+			cube.translateX(4);
 			mesh.translateZ(-20);
 			/*for(var i=0; i<cube.geometry.faces.length; i++){  // CICLO QUE ELIMINA LAS CARAS DEL CILINDRO
 				if(vector.dot(cube.geometry.faces[i].normal)>=0){ //PRODUCTO PUNTO
@@ -159,10 +162,15 @@
             renderer.setViewport( 0, 0, w, h);
             renderer.setScissor( 0, 0, w, h);
             renderer.render( scene, camera );
-            renderer.setViewport( 10, 0, mapWidth, mapHeight );
+			renderer.setViewport( 10, 250, mapWidth, mapHeight );
+            renderer.setScissor( 10, 250, mapWidth, mapHeight );
+            renderer.setScissorTest( true );
+            renderer.render( scene, camera3 );
+            renderer.setViewport( 10, 10, mapWidth, mapHeight );
             renderer.setScissor( 10, 10, mapWidth, mapHeight );
             renderer.setScissorTest( true );
             renderer.render( scene, camera2 );
+			
 		}
     </script>
   </body>
