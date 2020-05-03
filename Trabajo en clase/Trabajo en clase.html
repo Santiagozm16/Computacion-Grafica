@@ -12,17 +12,16 @@
     <script src='js/libs/dat.gui.min.js'></script>
     <script>
 		var scene, aspect, camera, camera2, renderer, controls;
-        var mapWidth = 520, mapHeight = 440;
+        var mapWidth = 320, mapHeight = 240;
         var w = window.innerWidth, h = window.innerHeight;
         var frustumSize = 5;
 		var startTime = Date.now();
 		var alpha = 45;
 		var betha = ((Math.atan((h/2)/(w/2)))*180/Math.PI)*2;
 		var raycaster = new THREE.Raycaster();
-		var mesh;
-		var cube;
 		var vectorAux;
 		var color_2 = 0xff0000;
+		var Objetos_escena= [];
 		init();
 		animate();
 	
@@ -30,7 +29,7 @@
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xAAAAAA );
 			aspect = window.innerWidth / window.innerHeight;
-			camera = new THREE.PerspectiveCamera( alpha, aspect, 0.1, 1000);
+			camera = new THREE.PerspectiveCamera( alpha, aspect, 0.1, 100);
 			camera2 = new THREE.PerspectiveCamera( alpha, 1.33, 0.1, 50);
             var helper = new THREE.CameraHelper( camera );
             scene.add( helper );
@@ -39,7 +38,8 @@
 			document.body.appendChild( renderer.domElement );
 			controls = new THREE.OrbitControls( camera, renderer.domElement );
 			var geometry,geometry1;
-            
+            var mesh;
+			var cube;
 			var size = 10;
 			var arrowSize = 1;
 			var divisions = size;
@@ -74,18 +74,9 @@
             scene.add( ambient );
             
             var pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
-            pointLight.position.set( 5, 5, -5 );
+            pointLight.position.set( 5, 5, 0 );
             scene.add( pointLight );
-            
-			//CREAR LAS GEOMETRÍAS
-			//Far plane
-			var width = 16.0;
-			var height = 9.0;
-			var planeGeometry = new THREE.PlaneGeometry(width, height);
-
-			//CUBO EN EL ESPACIO
-			var boxGeometry = new THREE.BoxGeometry(1,2,1);
-				
+			
             //CREAR LOS MATERIALES
             var material1 = new THREE.MeshStandardMaterial( { color: 0xAA3333, metalness: 0.5, roughness: 0.1 } );
             var material2 = new THREE.MeshStandardMaterial( { color: 0x33AA33, metalness: 0.5, roughness: 0.1 } );
@@ -97,24 +88,28 @@
             //scene.add( arrowZ );
             
             geometry = new THREE.CylinderGeometry( 3, 3, 16, 16 ); //GEOMETRIA CILINDO
-			var meshMaterial = new THREE.MeshStandardMaterial( {color: 0x00ff00} ); //MATERIAL CILINDRO
+			var meshMaterial = new THREE.MeshStandardMaterial( {color: 0x1c8e42} ); //MATERIAL CILINDRO
 			meshMaterial.vertexColors = THREE.FaceColors; // ???
 			meshMaterial.side = THREE.FrontSide; // ???
 			
 			mesh = new THREE.Mesh( geometry, meshMaterial );
 			var helper = new THREE.FaceNormalsHelper( mesh, 2, 0x0000ff, 1 ); //AYUDA DE LAS NORMALES DEL LA GEOMETRIA
 			
-			var geometry1 = new THREE.BoxGeometry( 1, 1, 1 );
-			var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-			//material.vertexColors = THREE.FaceColors; // ???
-			//material.side = THREE.FrontSide; // ???
+			var geometry1 = new THREE.BoxGeometry( 1.5, 1.5, 1.5 );
+			var material = new THREE.MeshStandardMaterial( {color: 0xac2015} );
 			cube = new THREE.Mesh( geometry1, material );
 			var helper1 = new THREE.FaceNormalsHelper( cube, 2, 0x0000ff, 1 );
+			
+			var geometry2 = new THREE.SphereGeometry( 1.5, 32, 32 );
+			var meshMaterial_1 = new THREE.MeshStandardMaterial( {color: 0xa34de3} );
+			var sphere = new THREE.Mesh( geometry2, meshMaterial_1 );
 			//cube.add(helper1);
-			cube.translateZ(-10);
-			cube.translateX(3);
-			//var a = cube.geometry.faces[2].normal;
-			//console.log(a);
+			//mesh.add(helper);
+			sphere.translateX(-8);
+			sphere.translateZ(-15);
+			cube.translateZ(-12.5);
+			cube.translateX(8);
+			mesh.translateZ(-20);
 			/*for(var i=0; i<cube.geometry.faces.length; i++){  // CICLO QUE ELIMINA LAS CARAS DEL CILINDRO
 				if(vector.dot(cube.geometry.faces[i].normal)>=0){ //PRODUCTO PUNTO
 					cube.geometry.faces.splice(i,1); //ELIMINA LA CARA
@@ -123,21 +118,21 @@
 			}*/
 			
 			scene.add(cube);
-			mesh.translateZ(-20);
-			//mesh.add(helper);
+			scene.add(sphere);
 			scene.add(mesh);
 			vectorAux = new THREE.Vector3(); 
 			camera2.getWorldDirection( vectorAux );
-			//console.log(vectorAux);
 			color_1=mesh.material.color;
-			camera.position.x = 26.24595136858507;
-			camera.position.y = 13.154941855406697;
-		  	camera.position.z = 48.35387824713483;
+			camera.position.x = 26;
+			camera.position.y = 13;
+		  	camera.position.z = 35;
 			camera2.position.x = -30;
 			camera2.position.y = 0;
 		  	camera2.position.z = -20;
 			camera2.rotation.y = -Math.PI/2;
-			
+			Objetos_escena.push(mesh);
+			Objetos_escena.push(cube);
+			Objetos_escena.push(sphere);
 			console.log("El angulo Betha es: ",betha);
 		  	camera.lookAt( origin );
 		}
@@ -149,9 +144,17 @@
         function render() {
 			
 			raycaster.setFromCamera( vectorAux, camera );
-			var intersects = raycaster.intersectObjects( scene.children );
+			var intersects = raycaster.intersectObjects( Objetos_escena );
 			for ( var i = 0; i < intersects.length; i++ ) {
-			intersects[ i ].object.material.color.set( color_2 );
+			//intersects[ i ].object.material.color.set( color_2 );
+				if(intersects.length =!0){ //intersects.length siempre va a ser de tamaño 1
+					for(var j=0; j<intersects[ 0 ].object.geometry.faces.length; j++){  // CICLO QUE ELIMINA LAS CARAS DEL CILINDRO
+						if(vectorAux.dot(intersects[ 0 ].object.geometry.faces[j].normal)>=0){ //PRODUCTO PUNTO
+							intersects[ 0 ].object.geometry.faces.splice(j,1); //ELIMINA LA CARA
+							intersects[ 0 ].object.geometry.elementsNeedUpdate = true; //BANDERA DE ACTUALIZACIÓN DE LA GEOMETRIA				
+						}
+					}
+				}
 			}
             renderer.setViewport( 0, 0, w, h);
             renderer.setScissor( 0, 0, w, h);
