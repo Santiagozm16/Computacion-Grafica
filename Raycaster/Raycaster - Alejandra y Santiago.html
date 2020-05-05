@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Camara Ortografica</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <script src="js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src='js/libs/dat.gui.min.js'></script>
+    <script>
+		var scene, aspect, camera, camera2, renderer, controls, raycaster, mesh, vector, raycaster2, mesh2, mesh3, mesh4, vector2, rayo, intersects;
+        var objetos = [];
+        var mapWidth = 320, mapHeight = 240;
+        var w = window.innerWidth, h = window.innerHeight;
+        var frustumSize = 5;
+		var startTime = Date.now();
+
+        var color_2 = 0xff0000;
+		
+		init();
+		animate();
+	
+		function init(){
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xAAAAAA );
+			aspect = window.innerWidth / window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 20, aspect, 0.1, 1000);
+			camera2 = new THREE.PerspectiveCamera( 40, 1.33, 0.1, 49);
+            var helper = new THREE.CameraHelper( camera2 );
+            scene.add( helper );
+			renderer = new THREE.WebGLRenderer({antialias: true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+            raycaster = new THREE.Raycaster();
+            raycaster.far = 50;
+            raycaster2 = new THREE.Raycaster();
+            
+			vector = new THREE.Vector3(0,0,1);
+			
+			var size = 10;
+			var arrowSize = 1;
+			var divisions = size;
+			var origin = new THREE.Vector3( 0, 0, 0 );
+			var x = new THREE.Vector3( 1, 0, 0 );
+			var y = new THREE.Vector3( 0, 1, 0 );
+		  	var z = new THREE.Vector3( 0, 0, 1 );
+			var color1 = new THREE.Color( 0xFFFFFF );
+		  	var color2 = new THREE.Color( 0x333333 );
+		  	var colorR = new THREE.Color( 0xAA3333 );
+		  	var colorG = new THREE.Color( 0x33AA33 );
+		  	var colorB = new THREE.Color( 0x333366 );
+		  
+		  	//CREAR LAS GRILLAS PARA EL ESCENARIO
+		  	var axesHelper = new THREE.AxesHelper( size );
+		  	var gridHelperXY = new THREE.GridHelper( size, divisions, color1, color1);
+		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color2, color2 );
+		  	var gridHelperYZ = new THREE.GridHelper( size, divisions, color2, color2 );
+            
+            //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+            gridHelperXY.rotateOnWorldAxis ( x, THREE.Math.degToRad(90) );
+            gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+            gridHelperYZ.rotateOnWorldAxis ( z, THREE.Math.degToRad(90) );
+            
+            //CREAR LAS FLECHAS QUE INDICAN LOS EJES DE COORDENADAS 3D
+            var arrowX = new THREE.ArrowHelper( x, origin, arrowSize, colorR );
+            var arrowY = new THREE.ArrowHelper( y, origin, arrowSize, colorG );
+            var arrowZ = new THREE.ArrowHelper( z, origin, arrowSize, colorB );
+            
+            //CREAR ILUMINACIÓN
+            var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+            scene.add( ambient );
+            
+            var pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
+            pointLight.position.set( 5, 5, -5 );
+            scene.add( pointLight );
+            
+			//CREAR LAS GEOMETRÍAS
+			//Far plane
+			var width = 16.0;
+			var height = 9.0;
+			var planeGeometry = new THREE.PlaneGeometry(48, 36);
+
+			//CUBO EN EL ESPACIO
+			var boxGeometry = new THREE.BoxGeometry(1,2,1);
+				
+            //CREAR LOS MATERIALES
+            var material1 = new THREE.MeshStandardMaterial( { color: 0xAA3333, metalness: 0.5, roughness: 0.1 } );
+            var material2 = new THREE.MeshStandardMaterial( { color: 0x33AA33, metalness: 0.5, roughness: 0.1 } );
+            var material3 = new THREE.MeshStandardMaterial( { color: 0x3333AA, metalness: 0.5, roughness: 0.1 } );
+			
+			//CREAR LOS OBJETOS
+            scene.add( arrowX );
+            scene.add( arrowY );
+            scene.add( arrowZ );
+            
+            var geometry = new THREE.CylinderGeometry( 3, 3, 10, 16 );
+            var geometry2 = new THREE.CylinderGeometry( 7, 7, 5, 10 );
+            var geometry3 = new THREE.BoxGeometry( 3, 3, 3 );
+			var geometry4 = new THREE.SphereGeometry( 1.5, 8, 8 );
+			var meshMaterial = new THREE.MeshStandardMaterial( {color: 0x66A945} );
+			var meshMaterial1 = new THREE.MeshStandardMaterial( {color: 0x0883C5} );
+			var meshMaterial2 = new THREE.MeshStandardMaterial( {color: 0xBD1E5B} );
+			var meshMaterial3 = new THREE.MeshStandardMaterial( {color: 0xa34de3} );
+			meshMaterial.vertexColors = THREE.FaceColors;
+			meshMaterial.side = THREE.FrontSide;
+
+            //var geometry = new THREE.PlaneGeometry( 70, 50, 32 );
+            var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+            plane = new THREE.Mesh( planeGeometry, material );
+            plane.position.z = -50;
+
+           
+
+
+			mesh = new THREE.Mesh( geometry, meshMaterial );
+            mesh.position.z = -20;
+            mesh2 = new THREE.Mesh( geometry2, meshMaterial2 );
+            mesh3 = new THREE.Mesh( geometry3, meshMaterial1 );
+			mesh4 = new THREE.Mesh( geometry4, meshMaterial3 );
+            mesh2.position.x = -15;
+            mesh2.position.z = -20;
+            mesh3.position.z = -40;
+            mesh3.position.x = 10;
+            mesh3.position.y = 10;
+			mesh4.position.z = -10;
+			mesh4.position.x = 5;
+           // mesh3.position.y = 20;
+			var helper = new THREE.FaceNormalsHelper( mesh, 2, 0x0000ff, 1 );
+            var helper2 = new THREE.FaceNormalsHelper( mesh2, 2, 0x0000ff, 1 );
+            var helper3 = new THREE.FaceNormalsHelper( mesh3, 2, 0x0000ff, 1 );
+            var helper4 = new THREE.FaceNormalsHelper( mesh4, 2, 0x0000ff, 1 );
+
+            
+			objetos.push(mesh);
+            objetos.push(mesh2);
+            objetos.push(mesh3);
+            objetos.push(mesh4);
+			
+            //group.add(plane);
+			//group.translateZ(-20);
+			//scene.add( group );
+
+            var contador = 0;
+            var arreglo = [];
+			
+            for(j = 0; j <= 36; j++){ //Ciclo para recorrer en y
+                for(i = 0; i <= 48; i++){ //Ciclo para recorrer en x
+                    vector2 = new THREE.Vector3(24-i, 18-j, -50); //Vector destino
+                    raycaster.set( vector, vector2.normalize() ); //Origen y destino del raycaster
+                    intersects = raycaster.intersectObjects( objetos ); 
+                    var aux = intersects.length;
+					//console.log(intersects);
+                    arreglo.push(intersects);     	
+					if(aux > 0 /*&& -50 < intersects[aux-1].object.position.z && 0.1 > intersects[aux-1].object.position.z && -24<= intersects[aux-1].object.position.x && 24>= intersects[aux-1].object.position.x && -18<= intersects[aux-1].object.position.y && 18 >= intersects[aux-1].object.position.y*/){ 
+						//intersects[aux-1].object.material.color.set( color_2 );
+						intersects[aux-1].object.material.elementsNeedUpdate = true;
+						for(var x= 0; x < intersects[ aux-1 ].object.geometry.faces.length; x++){
+							if(vector.dot(intersects[ aux-1].object.geometry.faces[x].normal) <= 0){ 
+								intersects[ aux-1].object.geometry.faces.splice(x,1);
+								intersects[ aux-1 ].object.geometry.elementsNeedUpdate = true;
+							}
+						}
+                    }                
+				}	
+            }
+
+			var posiciones = []; //ORDENAMIENTO DE IZQUIERDA A DERECHA PARA LAS FIGURAS TOMANDO COMO PARAMETRO EL VALOR DE X
+			var e = 0;
+			while(e<objetos.length){
+			posiciones.push(objetos[e].position.x)
+			e++;
+			}
+			var auxiliar;
+			var auxiliar2;
+			for(var m =0; m<posiciones.length;m++){
+				for(var k=0; k < posiciones.length; k++){
+					if( posiciones[k]>posiciones[k+1] ){
+						auxiliar = posiciones[k];
+						auxiliar2 = objetos[k];
+						posiciones[k] = posiciones[k+1];
+						objetos[k] = objetos[k+1];
+						posiciones[k+1] = auxiliar;
+						objetos[k+1] = auxiliar2;
+					}
+				}
+			}
+			
+			var colores = [];
+			for(var j = 0; j<objetos.length;j++){ //PINTAR LAS CARAS DE LA GEOMETRIA Y AGREGAR A UN ARREGLO
+				for(var i =0;i<objetos[j].geometry.faces.length;i++){
+				colores.push(objetos[j].geometry.faces[i].color.set(objetos[j].material.color));
+				}
+			}
+			
+			//console.log(colores);
+			
+			var geometryp = new THREE.PlaneGeometry( 2, 5, 5 );
+			var planos = [];
+			for(var i = 0;i<colores.length;i++){ //CREA LOS PLANOS CON EL COLOR INDICADO
+			var materialp = new THREE.MeshBasicMaterial( {color: colores[i]} );
+			var plane = new THREE.Mesh( geometryp, materialp );
+			planos.push(plane);
+			}
+			planos[0].position.x=-55;
+			planos[0].position.y=-20;
+			for(var i = 1;i<planos.length;i++){ //UBICAR PLANOS EN FILA
+			planos[0].add(planos[i]);
+				if(i == 1){
+				planos[i].position.x= 2.5;
+				}else{
+				planos[i].position.x = planos[i-1].position.x+2.5;
+				}
+			}
+			
+			scene.add(planos[0]);
+			scene.add(mesh);
+            scene.add(mesh2);
+            scene.add(mesh3);
+            scene.add(mesh4);
+			
+			//scene.add(helper);
+            //scene.add(helper2);
+            //scene.add(helper3);
+            //scene.add(helper4);
+			
+			camera.position.x = 73;
+			camera.position.y = 21;
+		  	camera.position.z = 176;
+            camera.rotation.y = Math.PI/2;
+
+			
+		  	camera.lookAt( mesh3 );
+		}
+		function animate(){
+            
+            requestAnimationFrame( animate );
+			controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
+			render();
+		}
+        function render() {
+
+			//console.log(camera.position);
+            renderer.setViewport( 0, 0, w, h );
+            renderer.setScissor( 0, 0, w, h );
+            renderer.render( scene, camera );
+            renderer.setViewport( 10, 10, mapWidth, mapHeight );
+            renderer.setScissor(10, 10, mapWidth, mapHeight );
+            renderer.setScissorTest( true );
+            renderer.render( scene, camera2 );
+		}
+    </script>
+  </body>
+</html>
