@@ -2,13 +2,28 @@
 <html>
   <head>
     <title>Dark</title>
+	<style>
+            html, body { margin: 0; padding: 0; overflow: hidden; }
+            #info {
+                position: absolute;
+                padding: 10px;
+                width: 100%;
+                text-align: center;
+                color: #ECE504;
+            }
+        </style>
+	<meta charset = "utf-8"/>
     <style>
-      html, body { margin: 0; padding: 0; overflow: hidden; }
+	
     </style>
   </head>
   <body>
+  <div id="info">DARK<br/>
+            Presentado por: Alejandra Pedraza, Valentina Cortes, Andres Rodriguez<br/>
+  </div>
     <script src="js/three.js"></script>
 	<script src="js/controls/OrbitControls.js"></script>
+	
     <script>
 		//https://dark-netflix.fandom.com/wiki/Magnus_Nielsen 
 		var scene, aspect, camera, renderer, controls;
@@ -43,8 +58,8 @@
 			scene.add( axesHelper );
 			
 		  	var gridHelperXZ = new THREE.GridHelper( size, divisions, color, color );
-			scene.add( gridHelperXZ );
-            
+			//scene.add( gridHelperXZ );
+           
             //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
             gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
 			var Ulrich_Nielsen = {
@@ -176,9 +191,12 @@
 			terceraG: [Katharina_Nielsen,Ulrich_Nielsen,Mads_Nielsen],
 			cuartaG: [Mikkel_Nielsen_Michael_Kahnwald,Martha_Nielsen,Magnus_Nielsen]
 			};
-			camera.position.x = 10;
-			camera.position.y = 10;
-		  	camera.position.z = 5;
+			console.log(Ulrich_Nielsen.nombre);
+			alert(Ulrich_Nielsen.nombre);
+			//scene.add(Ulrich_Nielsen.nombre);
+			camera.position.x = 1;
+			camera.position.y = 1;
+		  	camera.position.z = 1;
 			camera.lookAt( origin );
 			console.log(familia_Tiedemann);
 			console.log(familia_Doppler);
