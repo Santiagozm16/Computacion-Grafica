@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
   <head>
     <title>Dark</title>
+	<meta charset = "utf-8" />
    <style>
             html, body { margin: 0; padding: 0; overflow: hidden; }
             #info {
@@ -19,7 +20,9 @@
   <body onload= "crearArbol()">
     <script src="js/three.js"></script>
 	<script src="js/controls/TrackballControls.js"></script>
-	<script src="js/threex.domevents.js"></script>
+    <script src="js/threex.domevents.js"></script>
+    <script src="js/csg.js"></script>
+	<script src="js/THREE.CSG.js"></script>
 	
     <script>
 		
@@ -61,7 +64,7 @@
 			};
 			var Egon_Tiedemann = {
 			nombre: "Egon Tiedemann",
-			descripcion: "Egon era policía en 1953 y en 1986, cuando estuvo a cargo del caso de Mads y tiene un serio odio hacia Ulrich."
+			descripcion: "Egon era policía en 1953 y en 1986, cuando estuvo a cargo del caso de Mads \n y tiene un serio odio hacia Ulrich."
 			};
 			var Mikkel_Nielsen_Michael_Kahnwald = {
 			nombre: "Mikkel Nielsen o Michael Kahnwald",
@@ -158,6 +161,7 @@
 		var arbolFamilia2;
 		var arbolFamilia3;
 		var arbolFamilia4;
+		var minimo;
 		//var material;
 		//var nodo;
 		//var bolita;
@@ -387,7 +391,7 @@
 						side: THREE.DoubleSide
 					} );
 
-					text2 = new THREE.Mesh( geometry, matLite );
+					var text2 = new THREE.Mesh( geometry, matLite );
 					text2.position.x = 2;
 					text2.position.y = 10;
 					scene.add( text2);
@@ -418,12 +422,11 @@
 
 					} );
 
-			
-
+	
 			camera.position.x = 0;
 			camera.position.y = 0;
-		  	camera.position.z = 40;
-			camera.lookAt( origin );	
+		  	camera.position.z = 80;
+			camera.lookAt( origin );
 		}
 		
 		function crearArbol(){
@@ -457,7 +460,6 @@
 			arbolFamilia4[0].position.x=28;
 			arbolFamilia4[0].position.y=7;
 			scene.add(arbolFamilia4[0]);
-			
 			interactividadFamilia1();
 			interactividadFamilia2();
 			interactividadFamilia3();
@@ -465,21 +467,42 @@
 
 		}
 		function interactividadFamilia1(){
+            var plano;
+            var info;
 			var materialSelec = new THREE.LineBasicMaterial( { color: 0xF10000 });
 			var materialOriginal;
 			var domEvents=new THREEx.DomEvents(camera,render.domElement);
 			domEvents.addEventListener(arbolFamilia1[0],'mouseover', event=>{
-				arbolFamilia1[0].scale.set(2,2,2);
-				alert("Nombre: "+familia_Tiedemann.primeraG[0].nombre +" \n" +"Descripcion: "+familia_Tiedemann.primeraG[0].descripcion);
-			});
+                if(scene.children.length > 8){ //El valor de 8 son los objetos minimos en la escena
+					scene.remove(plano);
+					scene.remove(scene.children[scene.children.length-1]); //scene.children.length-1 es el espacio que ocupa el texto en el arreglo de la escena
+				}
+				var foto = "Egon.png";
+                var texto = familia_Tiedemann.primeraG[0].nombre;
+                var descrip = familia_Tiedemann.primeraG[0].descripcion;
+                arbolFamilia1[0].scale.set(2,2,2);
+                plano = Imgen(foto);
+                scene.add(plano);
+				info = Texto(texto, descrip, 0x000000);
+            });
 			domEvents.addEventListener(arbolFamilia1[0],'mouseout', event=>{
-				arbolFamilia1[0].scale.set(1,1,1);
+                arbolFamilia1[0].scale.set(1,1,1);
 			});
 			domEvents.addEventListener(arbolFamilia1[1],'mouseover', event=>{
+				if(scene.children.length > 8){ //El valor de 8 son los objetos minimos en la escena
+					scene.remove(plano);
+					scene.remove(scene.children[scene.children.length-1]); //scene.children.length-1 es el espacio que ocupa el texto en el arreglo de la escena
+				}
+                var foto = "Doris.jpg";
+                var texto = familia_Tiedemann.primeraG[1].nombre;
+                var descrip = familia_Tiedemann.primeraG[1].descripcion;
 				materialOriginal = arbolFamilia1[1].material;
 				arbolFamilia1[1].scale.set(2,2,2);
+                info = Texto(texto, descrip, 0x000000);
+                plano = Imgen(foto);
+                scene.add(plano);
 				arbolFamilia1[1].material = materialSelec;
-				alert("Nombre: "+familia_Tiedemann.primeraG[1].nombre +" \n" +"Descripcion: "+familia_Tiedemann.primeraG[1].descripcion);
+				
 			});
 			domEvents.addEventListener(arbolFamilia1[1],'mouseout', event=>{
 				arbolFamilia1[1].scale.set(1,1,1);
@@ -742,16 +765,59 @@
 				arbolFamilia4[8].scale.set(1,1,1);
 				arbolFamilia4[8].material = materialOriginal;
 			});
+        }
+        
+        function Imgen(nombre){
+        var texture = new THREE.TextureLoader();
+        var imagen = texture.load(nombre);
+        var geometryPlanof = new THREE.PlaneBufferGeometry( 8, 10, 32 );
+        var materialPlanof  = new THREE.MeshBasicMaterial( {map: imagen} );
+        var foto = new THREE.Mesh( geometryPlanof, materialPlanof );
+        foto.position.y = -19;
+        foto.position.x = -30;
+        return foto;
+        }
+
+        function Texto(nombre, info, verif){
+			//console.log(verif);
+			//console.log(nombre.toString());
+			var geometry;
+			var matLite;
+			var text;
+			var loader = new THREE.FontLoader();
+			loader.load( 'Bahnschrift_Regular.typeface.json', function ( font ) {
+			geometry = new THREE.TextBufferGeometry( "Nombre: " + nombre + "\nDescripción: " + info  , {
+					font: font,
+					size: 1.5,
+					height: 0.1,
+					curveSegments: 12,
+				} );
+			matLite = new THREE.MeshBasicMaterial( {
+					color: verif,
+					transparent: true,
+					opacity: 1,
+					side: THREE.DoubleSide
+				} );
+			text = new THREE.Mesh( geometry, matLite );
+					text.position.y = -17;
+					text.position.x = -25;
+					scene.add(text);
+				} );
 		}
-		
 		
 		function animate(){
 			requestAnimationFrame( animate );
 			controls.update();
 			render();
+			
 		}
+		//var capturar = false;
 		function render(){
-
+			//if(capturar == false){
+			//minimo = scene.children.length;
+			//capturar = true;
+			//console.log(minimo);
+			//}
 			renderer.render( scene, camera );
 		}
     </script>
