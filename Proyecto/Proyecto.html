@@ -517,14 +517,18 @@
 			interactividadFamilia4();
 
 		}
+		
+		var plano;
+        var info;
+		var objetosmin = 10; //Este de objetos en la escena antes de hacer la interacción y agregar las fotos y descripciones en pantalla
+		
 		function interactividadFamilia1(){
-            var plano;
-            var info;
+            
 			var materialSelec = new THREE.LineBasicMaterial( { color: 0xF10000 });
 			var materialOriginal;
 			var domEvents=new THREEx.DomEvents(camera,render.domElement);
 			domEvents.addEventListener(arbolFamilia1[0],'mouseover', event=>{
-                if(scene.children.length > 10){ //El valor de 10 son los objetos minimos en la escena
+                if(scene.children.length > objetosmin){ //El valor de 10 son los objetos minimos en la escena
 					scene.remove(plano);
 					scene.remove(scene.children[scene.children.length-1]); //scene.children.length-1 es el espacio que ocupa el texto en el arreglo de la escena
 				}
@@ -540,7 +544,7 @@
                 arbolFamilia1[0].scale.set(1,1,1);
 			});
 			domEvents.addEventListener(arbolFamilia1[1],'mouseover', event=>{
-				if(scene.children.length > 10){ //El valor de 10 son los objetos minimos en la escena
+				if(scene.children.length > objetosmin){ //El valor de 10 son los objetos minimos en la escena
 					scene.remove(plano);
 					scene.remove(scene.children[scene.children.length-1]); //scene.children.length-1 es el espacio que ocupa el texto en el arreglo de la escena
 				}
