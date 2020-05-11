@@ -161,7 +161,7 @@
 		var arbolFamilia2;
 		var arbolFamilia3;
 		var arbolFamilia4;
-		var minimo;
+		var starGeo,stars;
 		//var material;
 		//var nodo;
 		//var bolita;
@@ -306,15 +306,61 @@
 			{
 				scene.background = texture;
 			});*/
-			scene.background = new THREE.Color( 0xFFFFFF );
+			//scene.background = new THREE.Color( 0xFFFFFF );
 	        aspect = window.innerWidth / window.innerHeight;
 	        camera = new THREE.PerspectiveCamera( 75, aspect, 0.1, 1000);
 	        renderer = new THREE.WebGLRenderer({antialias: true});
 	        renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 			
-			controls = new THREE.TrackballControls(camera);
+			//CREAR EFECTOS EN EL FONDO DE LA ESCENA
+			  	starGeo= new THREE.Geometry();
+				var star;
+				for(var i=0;i<6000;i++){
+				   star= new THREE.Vector3(
+					Math.random()*600-300,
+					Math.random()*600-300,
+					Math.random()*600-300
+					);
+					star.velocity=0;
+					star.acceleration= 0.02;
+					starGeo.vertices.push(star);
+				}
+				let sprite= new THREE.TextureLoader().load("punto.png");
+				let starMaterial= new THREE.PointsMaterial({
+				 color:0xaaaaaa,
+				 size:0.7,
+				 map: sprite
+				
+				});	
+				stars= new THREE.Points(starGeo,starMaterial);
+				scene.add(stars);
+			//PONER MUSIQUITA 
+				var audioListener = new THREE.AudioListener();
+				camera.add( audioListener );
+				var musiK = new THREE.Audio( audioListener );
+				scene.add( musiK );
+				var loaderMs = new THREE.AudioLoader();
+				loaderMs.load(
+					'Fly me to the moon-Evangelion.mp3',	
+					function ( audioBuffer ) {
+						musiK.setBuffer( audioBuffer );
+						musiK.play();
+						
+					},
+					function ( xhr ) {
+						console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+					},
+					function ( err ) {
+						console.log( 'An error happened' );
+					}
+				);
+			
+			
 
+			//CONTROLES DE LA CAMARA
+			controls = new THREE.TrackballControls(camera);
+		
 			controls.rotateSpeed = 0.2;
 			controls.zoomSpeed = 4.0;
 
@@ -324,7 +370,10 @@
 			controls.staticMoving = false;
 			controls.dynamicDampingFactor = 0.3;
 			controls.addEventListener('change', render);
-
+			
+				
+			
+			
 			var text, text1, text2, text3;
 
 			  var loader = new THREE.FontLoader();
@@ -422,11 +471,12 @@
 
 					} );
 
-	
+			
+
 			camera.position.x = 0;
 			camera.position.y = 0;
-		  	camera.position.z = 80;
-			camera.lookAt( origin );
+		  	camera.position.z = 60;
+			camera.lookAt( origin );	
 		}
 		
 		function crearArbol(){
@@ -460,6 +510,7 @@
 			arbolFamilia4[0].position.x=28;
 			arbolFamilia4[0].position.y=7;
 			scene.add(arbolFamilia4[0]);
+			
 			interactividadFamilia1();
 			interactividadFamilia2();
 			interactividadFamilia3();
@@ -473,7 +524,7 @@
 			var materialOriginal;
 			var domEvents=new THREEx.DomEvents(camera,render.domElement);
 			domEvents.addEventListener(arbolFamilia1[0],'mouseover', event=>{
-                if(scene.children.length > 8){ //El valor de 8 son los objetos minimos en la escena
+                if(scene.children.length > 10){ //El valor de 10 son los objetos minimos en la escena
 					scene.remove(plano);
 					scene.remove(scene.children[scene.children.length-1]); //scene.children.length-1 es el espacio que ocupa el texto en el arreglo de la escena
 				}
@@ -483,13 +534,13 @@
                 arbolFamilia1[0].scale.set(2,2,2);
                 plano = Imgen(foto);
                 scene.add(plano);
-				info = Texto(texto, descrip, 0x000000);
+				info = Texto(texto, descrip, 0xFFFFFF);
             });
 			domEvents.addEventListener(arbolFamilia1[0],'mouseout', event=>{
                 arbolFamilia1[0].scale.set(1,1,1);
 			});
 			domEvents.addEventListener(arbolFamilia1[1],'mouseover', event=>{
-				if(scene.children.length > 8){ //El valor de 8 son los objetos minimos en la escena
+				if(scene.children.length > 10){ //El valor de 10 son los objetos minimos en la escena
 					scene.remove(plano);
 					scene.remove(scene.children[scene.children.length-1]); //scene.children.length-1 es el espacio que ocupa el texto en el arreglo de la escena
 				}
@@ -498,7 +549,7 @@
                 var descrip = familia_Tiedemann.primeraG[1].descripcion;
 				materialOriginal = arbolFamilia1[1].material;
 				arbolFamilia1[1].scale.set(2,2,2);
-                info = Texto(texto, descrip, 0x000000);
+                info = Texto(texto, descrip, 0xFFFFFF);
                 plano = Imgen(foto);
                 scene.add(plano);
 				arbolFamilia1[1].material = materialSelec;
@@ -774,7 +825,7 @@
         var materialPlanof  = new THREE.MeshBasicMaterial( {map: imagen} );
         var foto = new THREE.Mesh( geometryPlanof, materialPlanof );
         foto.position.y = -19;
-        foto.position.x = -30;
+        foto.position.x = -34;
         return foto;
         }
 
@@ -800,25 +851,31 @@
 				} );
 			text = new THREE.Mesh( geometry, matLite );
 					text.position.y = -17;
-					text.position.x = -25;
+					text.position.x = -29;
 					scene.add(text);
 				} );
 		}
 		
 		function animate(){
+			starGeo.vertices.forEach(p=>{
+				p.velocity +=p.acceleration;
+				p.z-=p.velocity;
+				//>><
+				if(p.z<-200){
+					p.z=200;
+					p.velocity=0;
+				}
+			});
+			starGeo.verticesNeedUpdate=true;
+			stars.rotation.z+=0.002;
 			requestAnimationFrame( animate );
 			controls.update();
 			render();
-			
 		}
-		//var capturar = false;
 		function render(){
-			//if(capturar == false){
-			//minimo = scene.children.length;
-			//capturar = true;
-			//console.log(minimo);
-			//}
+
 			renderer.render( scene, camera );
+			
 		}
     </script>
   </body>
