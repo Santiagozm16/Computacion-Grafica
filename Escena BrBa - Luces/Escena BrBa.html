@@ -71,12 +71,6 @@
 			light2.position.set( -0.3, 0, -40 );
 			scene.add( light2 );
 			
-			var spotLight = new THREE.SpotLight( 0xffffff, 0.8,50, Math.PI / 40,0.2);
-			var lightHelper = new THREE.SpotLightHelper( spotLight );
-			spotLight.position.set( 0, 0, -40);
-			spotLight.rotation.x = Math.PI + Math.PI/2;
-			spotLight.castShadow = true;
-			
 			var rectLight = new THREE.RectAreaLight( 0xffffff, 100, 2, 6 );
 			rectLight.position.set( 2.2, 2, -16.2 );
 			rectLight.rotation.x = Math.PI/2;
