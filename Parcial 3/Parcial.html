@@ -1,0 +1,453 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+	<meta charset = "utf-8" />
+    <title>Parcial 3</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+            #info {
+                position: absolute;
+                padding: 10px;
+                width: 100%;
+                text-align: center;
+                color: #ffffff;
+            }
+    </style>
+  </head>
+  <body>
+  <div id="info">Parcial 3<br/>
+            Presentado por: Andrés Santiago Rodríguez Prada<br/>
+			El personaje se mueve con las teclas A,S,D,W</br>
+        </div>
+    <script src="js/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+    <script src='js/libs/dat.gui.min.js'></script>
+    <script>
+		var scene, aspect, camera, camera2, renderer, controls;
+        var mapWidth = 320, mapHeight = 240;
+        var w = window.innerWidth, h = window.innerHeight;
+        var frustumSize = 5;
+		var startTime = Date.now();
+		var W = false;
+		var S = false;
+		var Q = false;
+		var E = false;
+		var A = false;
+		var D = false;
+		var jesse;
+		
+		
+		init();
+		animate();
+		
+		function planos(ancho,alto,triangulos,color){
+		var geometry = new THREE.PlaneBufferGeometry( ancho, alto, triangulos );
+		var material = new THREE.MeshStandardMaterial( { color, side: THREE.DoubleSide} );
+		var plane = new THREE.Mesh( geometry, material );
+		return plane;
+		}
+		
+		function personajes(ancho,alto,fondo,color){
+		var geometry = new THREE.BoxBufferGeometry( ancho, alto, fondo );
+		var material = new THREE.MeshStandardMaterial( {color} );
+		var box = new THREE.Mesh( geometry, material );
+		return box;
+		}
+		function init(){
+		
+			scene = new THREE.Scene();
+			//scene.background = new THREE.Color( 0xffffff );
+			scene.background = new THREE.Color( 0x000000  );
+			aspect = window.innerWidth / window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			camera2 = new THREE.PerspectiveCamera( 45, 1.33, 0.1, 40);
+            var helper = new THREE.CameraHelper( camera2 );
+            //scene.add( helper );
+			renderer = new THREE.WebGLRenderer({antialias: true});
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			controls = new THREE.OrbitControls( camera, renderer.domElement );
+			var sphere = new THREE.SphereBufferGeometry( 0.3, 16, 8 );
+            //CREAR ILUMINACIÓN
+            var light = new THREE.AmbientLight( 0xf39f18, 1 );
+			light.position.set( -0.1, 0, -25/4 );
+			//light.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) ) );
+            scene.add( light );
+
+			var light1 = new THREE.PointLight( 0xffb635, 0.5, 25 );
+			light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xf2e33d } ) ) );
+			light1.position.set( 10, 1.65, -5 );
+			scene.add( light1 );
+			
+			var light2 = new THREE.PointLight( 0xffb635, 0.5, 25 );
+			light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xf2e33d } ) ) );
+			light2.position.set( 13, 3.65, -2 );
+			scene.add( light2 );
+			
+			var light3 = new THREE.PointLight( 0xffb635, 0.5, 25 );
+			light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xf2e33d } ) ) );
+			light3.position.set( 8, 3.65, -7 );
+			scene.add( light3 );
+			
+			var light4 = new THREE.PointLight( 0xffb635, 0.5, 25 );
+			light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xf2e33d } ) ) );
+			light4.position.set( -10, 1.65, -5 );
+			scene.add( light4 );
+			
+			var light5 = new THREE.PointLight( 0xffb635, 0.5, 25 );
+			light5.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xf2e33d } ) ) );
+			light5.position.set( -13, 3.65, -2 );
+			scene.add( light5 );
+			
+			var light6 = new THREE.PointLight( 0xffb635, 0.5, 25 );
+			light6.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xf2e33d } ) ) );
+			light6.position.set( -8, 3.65, -7 );
+			scene.add( light6 );
+
+			var spotLight = new THREE.SpotLight( 0xffffff,1,15, Math.PI/6 ); //SpotLight( color : Integer, intensity : Float, distance : Float, angle : Radians, penumbra : Float, decay : Float )
+			spotLight.position.set( -9.8, 4, -5 );
+			spotLight.rotation.y=Math.PI/4;
+			spotLight.castShadow = true;
+			var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+			//scene.add( spotLightHelper );
+			scene.add( spotLight );
+			
+			var spotLight2 = new THREE.SpotLight( 0xffffff,1,15, Math.PI/6 ); //SpotLight( color : Integer, intensity : Float, distance : Float, angle : Radians, penumbra : Float, decay : Float )
+			spotLight2.position.set( 9.8, 4, -5 );
+			spotLight2.rotation.y=-Math.PI/4;
+			spotLight2.castShadow = true;
+			var spotLightHelper2 = new THREE.SpotLightHelper( spotLight2 );
+			//scene.add( spotLightHelper2 );
+			scene.add( spotLight2 );
+			
+			var onKeyDown = function ( event ) {
+				switch ( event.keyCode ) {
+					case 87: 
+						W = true;
+						break;
+					case 83: 
+						S = true;
+						break;
+					case 65:
+						A = true;
+						break;
+					case 68:
+						D = true;
+						break;
+						}
+						};
+			var onKeyUp = function ( event ) {
+				switch ( event.keyCode ) {
+					case 87:
+						W = false;
+						break;
+					case 83:
+						S = false;
+						break;
+					case 65:
+						A = false;
+						break;
+					case 68:
+						D = false;
+						break;
+						}
+						};
+			
+			document.addEventListener( 'keydown', onKeyDown, false );
+			document.addEventListener( 'keyup', onKeyUp, false );
+			
+			//Materiales
+            var texturaPared = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/WoodFloor007_2K_Color.jpg' );
+            var paredNormal = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/WoodFloor007_2K_Normal.jpg' );
+            var paredAo = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/WoodFloor007_2K_AmbientOcclusion.jpg' );
+            var paredRoughness = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/WoodFloor007_2K_Roughness.jpg' );
+			
+			var paredStandar = new THREE.MeshStandardMaterial( { 
+                    color: 0x8a450e, 
+				    map: texturaPared,
+					normalMap: paredNormal,
+                    //displacementMap: alfombraDisplacement,
+                    aoMap: paredAo,
+					roughnessMap: paredRoughness,
+					//roughness: 0.025,
+					side: THREE.DoubleSide,
+			} );
+			
+			var sillasBase = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/Fabric026_2K_Color.jpg' );
+            var sillasNormal = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/Fabric026_2K_Normal.jpg' );
+            var sillasRoughness = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/Fabric026_2K_Roughness.jpg' );
+			
+			var sillasStandar = new THREE.MeshStandardMaterial( { 
+                    color: 0xbc4f35,
+					map: sillasBase,
+					normalMap: sillasNormal,
+					roughnessMap: sillasRoughness,
+					//roughness: 0.09,
+					side: THREE.DoubleSide,
+			} );
+			
+			//Escenario 
+			jesse = personajes(0.5,1.5,0.5,0x000000);
+			jesse.position.x = 0.65;
+			jesse.position.y = 1.2;
+			jesse.position.z = -12.5;
+			var cabeza = personajes(0.5,0.5,0.5,0xc48035);
+			
+			cabeza.position.y = 1.5/2+0.25;
+			jesse.add(cabeza);
+			scene.add( jesse );
+			scene.add( spotLight.target );
+			
+			var piso = planos(30,15,32,0x5f2d1c);
+			piso.rotation.x = Math.PI/2;
+			piso.position.y = -1.5;
+			piso.position.z= -5.5;
+			scene.add(piso);
+			
+			var paredes1 = planos(15,9,32,0x8a450e);
+			paredes1.rotation.y= -Math.PI/4;
+			paredes1.position.x= 9.5;
+			paredes1.position.z= -5.5;
+			paredes1.position.y= 2;
+			paredes1.material = paredStandar;
+			scene.add(paredes1);
+			var paredes2 = paredes1.clone();
+			paredes2.position.x= -9.5;
+			paredes2.rotation.y= Math.PI/4;
+			scene.add(paredes2);
+			
+			var paredTarima = planos(9,2,32,0x110507);
+			paredTarima.position.z = -10.8;
+			paredTarima.position.y = -0.5;
+			scene.add(paredTarima);
+			
+			var pisoTarima = paredTarima.clone();
+			pisoTarima.rotation.x = Math.PI/2;
+			pisoTarima.position.y = 0.5;
+			pisoTarima.position.z = -11.8;
+			scene.add(pisoTarima);
+			
+			var sillas = personajes(0.8,1,0.2,0xbc4f35);
+			sillas.position.y=-1;
+			sillas.material = sillasStandar;
+			var sillas2 = sillas.clone();
+			var sillas3 = sillas.clone();
+			var sillas4 = sillas.clone();
+			var sillas5 = sillas.clone();
+			var sillas6 = sillas.clone();
+			sillas2.position.z = -1;
+			sillas3.position.z = -2;
+			sillas4.position.z = -3;
+			sillas5.position.z = -4;
+			sillas6.position.z = -5;
+			scene.add(sillas);
+			scene.add(sillas2);
+			scene.add(sillas3);
+			scene.add(sillas4);
+			scene.add(sillas5);
+			scene.add(sillas6);
+			
+			var sillas7 = sillas.clone();
+			sillas7.position.x= 2;
+			var sillas8 = sillas7.clone();
+			var sillas9 = sillas7.clone();
+			var sillas10 = sillas7.clone();
+			var sillas11 = sillas7.clone();
+			var sillas12= sillas7.clone();
+			sillas8.position.z = -1;
+			sillas9.position.z = -2;
+			sillas10.position.z = -3;
+			sillas11.position.z = -4;
+			sillas12.position.z = -5;
+			scene.add(sillas7);
+			scene.add(sillas8);
+			scene.add(sillas9);
+			scene.add(sillas10);
+			scene.add(sillas11);
+			scene.add(sillas12);
+			
+			
+			var sillas13 = sillas.clone();
+			sillas13.position.x= -2;
+			var sillas14 = sillas13.clone();
+			var sillas15 = sillas13.clone();
+			var sillas16 = sillas13.clone();
+			var sillas17 = sillas13.clone();
+			var sillas18 = sillas13.clone();
+			sillas14.position.z = -1;
+			sillas15.position.z = -2;
+			sillas16.position.z = -3;
+			sillas17.position.z = -4;
+			sillas18.position.z = -5;
+			scene.add(sillas13);
+			scene.add(sillas14);
+			scene.add(sillas15);
+			scene.add(sillas16);
+			scene.add(sillas17);
+			scene.add(sillas18);
+			
+			var sillas19 = sillas.clone();
+			sillas19.position.x= -7;
+			sillas19.rotation.y= -Math.PI/6;
+			var sillas20 = sillas19.clone();
+			var sillas21 = sillas19.clone();
+			var sillas22 = sillas19.clone();
+			var sillas23 = sillas19.clone();
+			var sillas24 = sillas19.clone();
+			sillas20.position.z = -1;
+			sillas20.position.x = -32/5;
+			sillas21.position.z = -2;
+			sillas21.position.x = -5.8;
+			sillas22.position.z = -3;
+			sillas22.position.x = -26/5;
+			sillas23.position.z = -4;
+			sillas23.position.x = -23/5;
+			sillas24.position.z = -5;
+			sillas24.position.x = -4;
+			scene.add(sillas19);
+			scene.add(sillas20);
+			scene.add(sillas21);
+			scene.add(sillas22);
+			scene.add(sillas23);
+			scene.add(sillas24);
+			
+			var sillas25 = sillas.clone();
+			sillas25.position.x= -9;
+			sillas25.position.z= -1.2;
+			sillas25.rotation.y= -Math.PI/6;
+			var sillas26 = sillas25.clone();
+			var sillas27 = sillas25.clone();
+			var sillas28 = sillas25.clone();
+			var sillas29 = sillas25.clone();
+			var sillas30 = sillas25.clone();
+			sillas26.position.z = -1-1.2;
+			sillas26.position.x = -32/5-2;
+			sillas27.position.z = -2-1.2;
+			sillas27.position.x = -5.8-2;
+			sillas28.position.z = -3-1.2;
+			sillas28.position.x = -26/5-2;
+			sillas29.position.z = -4-1.2;
+			sillas29.position.x = -23/5-2;
+			sillas30.position.z = -5-1.2;
+			sillas30.position.x = -4-2;
+			scene.add(sillas25);
+			scene.add(sillas26);
+			scene.add(sillas27);
+			scene.add(sillas28);
+			scene.add(sillas29);
+			scene.add(sillas30);
+			
+			var sillas31 = sillas.clone();
+			sillas31.position.x= 7;
+			sillas31.rotation.y= Math.PI/6;
+			var sillas32 = sillas31.clone();
+			var sillas33 = sillas31.clone();
+			var sillas34 = sillas31.clone();
+			var sillas35 = sillas31.clone();
+			var sillas36 = sillas31.clone();
+			sillas32.position.z = -1;
+			sillas32.position.x = 32/5;
+			sillas33.position.z = -2;
+			sillas33.position.x = 5.8;
+			sillas34.position.z = -3;
+			sillas34.position.x = 26/5;
+			sillas35.position.z = -4;
+			sillas35.position.x = 23/5;
+			sillas36.position.z = -5;
+			sillas36.position.x = 4;
+			scene.add(sillas31);
+			scene.add(sillas32);
+			scene.add(sillas33);
+			scene.add(sillas34);
+			scene.add(sillas35);
+			scene.add(sillas36);
+			
+			var sillas37 = sillas.clone();
+			sillas37.position.x= 9;
+			sillas37.position.z= -1.2;
+			sillas37.rotation.y= Math.PI/6;
+			var sillas38 = sillas37.clone();
+			var sillas39 = sillas37.clone();
+			var sillas40 = sillas37.clone();
+			var sillas41 = sillas37.clone();
+			var sillas42 = sillas37.clone();
+			sillas38.position.z = -1-1.2;
+			sillas38.position.x = 32/5+2;
+			sillas39.position.z = -2-1.2;
+			sillas39.position.x = 5.8+2;
+			sillas40.position.z = -3-1.2;
+			sillas40.position.x = 26/5+2;
+			sillas41.position.z = -4-1.2;
+			sillas41.position.x = 23/5+2;
+			sillas42.position.z = -5-1.2;
+			sillas42.position.x = 4+2;
+			scene.add(sillas37);
+			scene.add(sillas38);
+			scene.add(sillas39);
+			scene.add(sillas40);
+			scene.add(sillas41);
+			scene.add(sillas42);
+			
+			var cortina = planos(11,8,32,0xf8222e);
+			cortina.position.z = -12.8;
+			cortina.position.y = 2.5;
+		
+			var cortinaColor = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/theater.jpg' );
+			var cortinaAlpha = new THREE.TextureLoader().load( 'http://www.avilagab.com/umng/CGCAJ20201/parcial3/theaterAlpha.jpg' );
+			
+			var curtainMaterial = new THREE.MeshStandardMaterial( {
+			color: 0xffffff,
+			map: cortinaColor,
+			alphaMap: cortinaAlpha,
+			transparent: true
+			} );
+			
+			cortina.material = curtainMaterial;
+			scene.add(cortina);
+			
+			
+			camera.position.x = 5;
+			camera.position.y = 0;
+			camera2.position.y = 0.5;
+		  	camera.position.z = 10;
+		  	camera2.position.z = -0.45;
+			
+		  	camera.lookAt( origin );
+		}
+		function animate() {
+			requestAnimationFrame( animate );
+			controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
+			render();
+		}
+        function render() {
+            renderer.setViewport( 0, 0, w, h );
+            renderer.setScissor( 0, 0, w, h );
+            renderer.render( scene, camera );
+		if(W){
+		jesse.position.z+=0.2;
+		}
+		if(S){
+		jesse.position.z-=0.2;
+		}
+		if(D){
+		jesse.position.x-=0.2;
+		}
+		if(A){
+		jesse.position.x+=0.2;
+		}
+            renderer.setViewport( 10, 10, mapWidth*2, mapHeight*2 );
+            renderer.setScissor( 10, 10, mapWidth*2, mapHeight*2 );
+            renderer.setScissorTest( true );
+            renderer.render( scene, camera2 );
+		}
+    </script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
